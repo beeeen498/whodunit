@@ -2,6 +2,8 @@
 
 import { useEffect } from "react";
 import { useGameStore } from "@/stores/gameStore";
+import { useTextStore } from "@/stores/textStore";
+import TextPanel from "@/components/game/TextPanel/TextPanel";
 import styles from "./SceneViewer.module.scss";
 
 // ========================
@@ -12,6 +14,7 @@ import styles from "./SceneViewer.module.scss";
 export default function SceneViewer() {
   const { scenes, currentScene, currentConnections, loadScene, visitScene } =
     useGameStore();
+  const { addLines, clear } = useTextStore();
 
   // On first load, pick the starting scene
   // (Detective's Office) and load it
@@ -25,6 +28,14 @@ export default function SceneViewer() {
       }
     }
   }, [scenes, currentScene, loadScene, visitScene]);
+
+  // Clears old text when entering a new scene,and feeds the scene description as a narrator line that types out.
+  useEffect(() => {
+    if (currentScene) {
+      clear();
+      addLines([{ text: currentScene.description || "", speaker: "narrator" }]);
+    }
+  }, [currentScene, addLines, clear]);
 
   // Nothing loaded yet
   if (!currentScene) return null;
@@ -69,38 +80,7 @@ export default function SceneViewer() {
       </div>
 
       {/* Right — text panel (33%) */}
-      <div className={styles.textPanel}>
-        {/* Scene description */}
-        <div className={styles.description}>
-          <h3 className={styles.descriptionTitle}>{currentScene.name}</h3>
-          <p className={styles.descriptionText}>{currentScene.description}</p>
-        </div>
-
-        {/* Navigation exits */}
-        {exits.length > 0 && (
-          <div className={styles.exits}>
-            {exits.map((exit) => (
-              <button
-                key={exit.id}
-                className={`${styles.exitButton} ${
-                  exit.targetLocked ? styles.locked : ""
-                }`}
-                onClick={() =>
-                  !exit.targetLocked && handleNavigate(exit.scene_id_to)
-                }
-                disabled={exit.targetLocked}
-              >
-                <span className={styles.exitLabel}>
-                  {exit.label || exit.targetName}
-                </span>
-                {exit.targetLocked && (
-                  <span className={styles.lockIcon}>🔒</span>
-                )}
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
+      <TextPanel />
     </div>
   );
 }
