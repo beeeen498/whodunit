@@ -4,20 +4,24 @@ import Link from "next/link";
 import styles from "./Hero.module.scss";
 
 // ========================
-// Hero — full-screen noir landing
+// Hero — noir landing screen
 // ========================
 
 export default function Hero() {
   return (
     <main className={styles.hero}>
-      {/* Fog overlay for atmosphere */}
-      <div className={styles.fog} />
+      {/* Layered atmosphere effects */}
+      <div className={styles.venetianBlinds} />
+      <div className={styles.filmGrain} />
+      <div className={styles.vignette} />
+      <div className={styles.smoke} />
 
-      {/* Center content */}
+      {/* Center content — sits above all overlays */}
       <div className={styles.content}>
         <h1 className={styles.title}>Whodunit</h1>
+        <div className={styles.divider} />
         <p className={styles.tagline}>
-          Every suspect has a secret. Every clue has a cost.
+          Every suspect lies. Every clue tells the truth.
         </p>
 
         {/* Call to action */}

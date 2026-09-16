@@ -1,5 +1,5 @@
 // ========================
-// Hero — full-screen landing
+// Hero — full-screen noir landing
 // ========================
 
 .hero {
@@ -9,90 +9,209 @@
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  background-color: var(--bg-primary);
+  background-color: #080808;
   overflow: hidden;
 }
 
 // ========================
-// Fog — animated overlay for atmosphere
+// Venetian blinds — horizontal light slats
+// cutting across the screen like light
+// through window blinds
 // ========================
 
-.fog {
+.venetianBlinds {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    180deg,
+    transparent 0px,
+    transparent 40px,
+    rgba(200, 170, 80, 0.04) 40px,
+    rgba(200, 170, 80, 0.04) 44px
+  );
+
+  // Slowly rotates the angle to feel like
+  // light shifting through a window
+  animation: blindsSway 12s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes blindsSway {
+  0%,
+  100% {
+    transform: skewY(-2deg) scaleY(1);
+  }
+  50% {
+    transform: skewY(1deg) scaleY(1.02);
+  }
+}
+
+// ========================
+// Film grain — noisy texture overlay
+// gives that old film stock look
+// ========================
+
+.filmGrain {
+  position: absolute;
+  inset: -50%;
+  width: 200%;
+  height: 200%;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.08'/%3E%3C/svg%3E");
+  opacity: 0.5;
+  pointer-events: none;
+  animation: grainShift 0.5s steps(1) infinite;
+}
+
+@keyframes grainShift {
+  0% {
+    transform: translate(0, 0);
+  }
+  25% {
+    transform: translate(-5%, -5%);
+  }
+  50% {
+    transform: translate(5%, 2%);
+  }
+  75% {
+    transform: translate(-2%, 5%);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+// ========================
+// Vignette — dark edges, lighter center
+// classic noir framing
+// ========================
+
+.vignette {
   position: absolute;
   inset: 0;
   background: radial-gradient(
-    ellipse at 50% 50%,
-    rgba(44, 62, 80, 0.15) 0%,
-    transparent 70%
+    ellipse at 50% 45%,
+    transparent 20%,
+    rgba(0, 0, 0, 0.5) 60%,
+    rgba(0, 0, 0, 0.85) 100%
   );
   pointer-events: none;
-  animation: fogPulse 8s ease-in-out infinite;
 }
 
-@keyframes fogPulse {
-  0%,
-  100% {
-    opacity: 0.4;
+// ========================
+// Smoke — drifting haze across the screen
+// ========================
+
+.smoke {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(
+      ellipse at 30% 60%,
+      rgba(180, 160, 120, 0.06) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      ellipse at 70% 40%,
+      rgba(180, 160, 120, 0.04) 0%,
+      transparent 50%
+    );
+  pointer-events: none;
+  animation: smokeDrift 10s ease-in-out infinite alternate;
+}
+
+@keyframes smokeDrift {
+  0% {
+    transform: translateX(-20px);
+    opacity: 0.6;
   }
-  50% {
-    opacity: 0.8;
+  100% {
+    transform: translateX(20px);
+    opacity: 1;
   }
 }
 
 // ========================
 // Content — centered title block
+// sits above all overlays
 // ========================
 
 .content {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   text-align: center;
   padding: 2rem;
 }
 
+// Title — tall condensed serif, high contrast
+// with a warm amber glow behind it
 .title {
-  font-size: 5rem;
-  letter-spacing: 0.3em;
+  font-family: "Georgia", "Times New Roman", serif;
+  font-size: 6rem;
+  font-weight: 700;
+  letter-spacing: 0.4em;
   text-transform: uppercase;
-  color: var(--accent);
-  text-shadow: 0 0 40px rgba(201, 168, 76, 0.3);
-  margin-bottom: 1rem;
+  color: #e8d5a3;
+  text-shadow:
+    0 0 60px rgba(200, 170, 80, 0.25),
+    0 0 120px rgba(200, 170, 80, 0.1);
 
-  // Fade in on load
-  animation: fadeInUp 1.5s ease-out;
+  // Slight flicker like a lamp
+  animation:
+    fadeInUp 2s ease-out,
+    flicker 4s ease-in-out 2s infinite;
+}
+
+// Thin gold line under the title
+.divider {
+  width: 120px;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(200, 170, 80, 0.5),
+    transparent
+  );
+  margin: 1.5rem auto;
+  animation: fadeInUp 2s ease-out 0.3s both;
 }
 
 .tagline {
-  font-size: 1.25rem;
+  font-family: "Georgia", "Times New Roman", serif;
+  font-size: 1.1rem;
   font-style: italic;
-  color: var(--text-muted);
+  color: #777;
+  letter-spacing: 0.08em;
   margin-bottom: 3rem;
-
-  animation: fadeInUp 1.5s ease-out 0.3s both;
+  animation: fadeInUp 2s ease-out 0.5s both;
 }
 
 // ========================
-// Play button — gold outlined CTA
+// Play button — outlined, minimal
+// glows on hover like a neon sign
 // ========================
 
 .actions {
-  animation: fadeInUp 1.5s ease-out 0.6s both;
+  animation: fadeInUp 2s ease-out 0.8s both;
 }
 
 .playButton {
   display: inline-block;
-  padding: 1rem 3rem;
-  border: 1px solid var(--accent);
-  color: var(--accent);
-  font-size: 1.1rem;
-  letter-spacing: 0.15em;
+  padding: 0.9rem 2.5rem;
+  border: 1px solid rgba(200, 170, 80, 0.4);
+  color: #c8aa50;
+  font-family: "Georgia", "Times New Roman", serif;
+  font-size: 0.85rem;
+  letter-spacing: 0.25em;
   text-transform: uppercase;
-  transition: all 0.4s ease;
+  transition: all 0.5s ease;
 
   &:hover {
-    background-color: var(--accent);
-    color: var(--bg-primary);
-    box-shadow: 0 0 30px rgba(201, 168, 76, 0.3);
+    border-color: rgba(200, 170, 80, 0.8);
+    color: #e8d5a3;
+    background-color: rgba(200, 170, 80, 0.08);
+    box-shadow:
+      0 0 30px rgba(200, 170, 80, 0.15),
+      inset 0 0 30px rgba(200, 170, 80, 0.05);
   }
 }
 
@@ -103,12 +222,13 @@
 .footer {
   position: absolute;
   bottom: 2rem;
-  z-index: 1;
+  z-index: 2;
 
   p {
-    font-size: 0.8rem;
-    color: var(--text-muted);
-    letter-spacing: 0.1em;
+    font-family: "Georgia", "Times New Roman", serif;
+    font-size: 0.7rem;
+    color: #555;
+    letter-spacing: 0.15em;
     text-transform: uppercase;
   }
 }
@@ -125,5 +245,28 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+// Subtle lamp flicker on the title
+@keyframes flicker {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  92% {
+    opacity: 1;
+  }
+  93% {
+    opacity: 0.85;
+  }
+  94% {
+    opacity: 1;
+  }
+  96% {
+    opacity: 0.9;
+  }
+  97% {
+    opacity: 1;
   }
 }
