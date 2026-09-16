@@ -1,0 +1,111 @@
+// ========================
+// Color Palette — noir theme
+// ========================
+
+:root {
+  --black: #0a0a0a;
+  --dark: #1a1a1a;
+  --dark-medium: #2a2a2a;
+  --medium: #3a3a3a;
+  --grey: #777777;
+  --light-grey: #aaaaaa;
+  --off-white: #d4d4d4;
+  --white: #f0e6d3;
+
+  // Accent colors
+  --gold: #c9a84c;
+  --gold-dim: #a68a3e;
+  --red: #8b2d2d;
+  --red-bright: #c0392b;
+  --blue-smoke: #2c3e50;
+
+  // Functional
+  --bg-primary: var(--black);
+  --bg-secondary: var(--dark);
+  --bg-card: var(--dark-medium);
+  --text-primary: var(--white);
+  --text-secondary: var(--light-grey);
+  --text-muted: var(--grey);
+  --accent: var(--gold);
+  --accent-hover: var(--gold-dim);
+  --danger: var(--red-bright);
+}
+
+// ========================
+// Reset
+// ========================
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: "Georgia", "Times New Roman", serif;
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+// ========================
+// Typography
+// ========================
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Georgia", "Times New Roman", serif;
+  font-weight: 400;
+  line-height: 1.2;
+  color: var(--text-primary);
+}
+
+p {
+  color: var(--text-secondary);
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+  transition: color 0.3s ease;
+
+  &:hover {
+    color: var(--accent-hover);
+  }
+}
+
+// ========================
+// Utility
+// ========================
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: inherit;
+  color: inherit;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+ul,
+ol {
+  list-style: none;
+}
