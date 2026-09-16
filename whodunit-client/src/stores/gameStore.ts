@@ -1,6 +1,20 @@
-import { create } from 'zustand';
-import type { GameState, Case, Scene, SceneConnection, Clue, Suspect, DialogueNode, Audio, ScriptedEvent } from '@/types';
-import * as api from '@/services/api';
+import { create } from "zustand";
+import type {
+  GameState,
+  Case,
+  Scene,
+  SceneConnection,
+  Clue,
+  Suspect,
+  DialogueNode,
+  Audio,
+  ScriptedEvent,
+} from "@/types";
+import * as api from "@/services/api";
+
+// ========================
+// Types
+// ========================
 
 interface GameStore {
   // Core data
@@ -32,10 +46,17 @@ interface GameStore {
   makeConnection: (connectionId: string) => Promise<void>;
   startDialogue: (suspect: Suspect) => Promise<void>;
   completeDialogue: (dialogueId: string) => Promise<void>;
-  validateEvidence: (clueId1: string, clueId2: string) => Promise<api.ApiError | null>;
+  validateEvidence: (
+    clueId1: string,
+    clueId2: string,
+  ) => Promise<api.ApiError | null>;
   updateAct: (act: number) => Promise<void>;
   reset: () => void;
 }
+
+// ========================
+// Initial state
+// ========================
 
 const initialState = {
   caseData: null,
@@ -53,24 +74,45 @@ const initialState = {
   error: null,
 };
 
+// ========================
+// Store
+// ========================
+
 export const useGameStore = create<GameStore>((set, get) => ({
   ...initialState,
 
+  // Load case data and set up local guest state
   initGame: async (caseId: string) => {
     set({ loading: true, error: null });
     try {
-      const [caseData, gameState, suspects, audioTracks] = await Promise.all([
-        api.getCase(caseId),
-        api.createGameState(caseId),
-        api.getSuspects(caseId),
-        api.getAudio(caseId),
-      ]);
+      const caseData = await api.getCase(caseId);
+      const suspects = await api.getSuspects(caseId);
 
-      const scriptedEvents = await api.getScriptedEvents(caseId, 1);
+      // These endpoints might not exist yet — don't fail the whole game
+      const audioTracks = await api.getAudio(caseId).catch(() => []);
+      const scriptedEvents = await api
+        .getScriptedEvents(caseId, 1)
+        .catch(() => []);
+
+      const localGameState: GameState = {
+        id: "guest",
+        player_id: "guest",
+        case_id: caseId,
+        current_act: 1,
+        current_scene_id: null,
+        clues_found: [],
+        connections_made: [],
+        dialogues_completed: [],
+        scenes_visited: [],
+        accusations_made: 0,
+        start_time: new Date().toISOString(),
+        last_played: new Date().toISOString(),
+        status: "in_progress",
+      };
 
       set({
         caseData,
-        gameState,
+        gameState: localGameState,
         suspects,
         audioTracks,
         scriptedEvents,
@@ -81,6 +123,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
   },
 
+  // Fetch scene details and set as current
   loadScene: async (sceneId: string) => {
     const { gameState } = get();
     if (!gameState) return;
@@ -99,42 +142,46 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
   },
 
+  // Add a clue to the found list
   discoverClue: async (clueId: string) => {
     const { gameState } = get();
     if (!gameState) return;
 
-    try {
-      const updated = await api.addClueFound(gameState.id, clueId);
-      set({ gameState: updated });
-    } catch (err) {
-      set({ error: (err as Error).message });
-    }
+    set({
+      gameState: {
+        ...gameState,
+        clues_found: [...gameState.clues_found, clueId],
+      },
+    });
   },
 
+  // Mark a scene as visited
   visitScene: async (sceneId: string) => {
     const { gameState } = get();
     if (!gameState) return;
 
-    try {
-      const updated = await api.addSceneVisited(gameState.id, sceneId);
-      set({ gameState: updated });
-    } catch (err) {
-      set({ error: (err as Error).message });
-    }
+    set({
+      gameState: {
+        ...gameState,
+        scenes_visited: [...gameState.scenes_visited, sceneId],
+      },
+    });
   },
 
+  // Add an evidence connection
   makeConnection: async (connectionId: string) => {
     const { gameState } = get();
     if (!gameState) return;
 
-    try {
-      const updated = await api.addConnectionMade(gameState.id, connectionId);
-      set({ gameState: updated });
-    } catch (err) {
-      set({ error: (err as Error).message });
-    }
+    set({
+      gameState: {
+        ...gameState,
+        connections_made: [...gameState.connections_made, connectionId],
+      },
+    });
   },
 
+  // Load dialogue for a suspect
   startDialogue: async (suspect: Suspect) => {
     const { gameState } = get();
     if (!gameState) return;
@@ -147,18 +194,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
   },
 
+  // Mark a dialogue node as completed
   completeDialogue: async (dialogueId: string) => {
     const { gameState } = get();
     if (!gameState) return;
 
-    try {
-      const updated = await api.addDialogueCompleted(gameState.id, dialogueId);
-      set({ gameState: updated });
-    } catch (err) {
-      set({ error: (err as Error).message });
-    }
+    set({
+      gameState: {
+        ...gameState,
+        dialogues_completed: [...gameState.dialogues_completed, dialogueId],
+      },
+    });
   },
 
+  // Check if two clues form a valid connection
   validateEvidence: async (clueId1: string, clueId2: string) => {
     const { gameState } = get();
     if (!gameState) return null;
@@ -166,8 +215,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
     try {
       const result = await api.validateEvidence(clueId1, clueId2, gameState.id);
       if (result.is_valid) {
-        // Refresh game state to get updated connections
-        const updated = await api.loadGameState(gameState.id);
+        const updated = {
+          ...gameState,
+          connections_made: [
+            ...gameState.connections_made,
+            result.unlock_id || "",
+          ],
+        };
         set({ gameState: updated });
       }
       return null;
@@ -176,18 +230,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
   },
 
+  // Move to the next act
   updateAct: async (act: number) => {
     const { gameState, caseData } = get();
     if (!gameState || !caseData) return;
 
     try {
-      const updated = await api.updateGameState(gameState.id, { current_act: act });
       const scriptedEvents = await api.getScriptedEvents(caseData.id, act);
-      set({ gameState: updated, scriptedEvents });
+      set({
+        gameState: { ...gameState, current_act: act },
+        scriptedEvents,
+      });
     } catch (err) {
       set({ error: (err as Error).message });
     }
   },
 
+  // Reset everything
   reset: () => set(initialState),
 }));
