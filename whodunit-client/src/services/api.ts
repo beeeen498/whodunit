@@ -1,7 +1,7 @@
-
 import type {
   AuthResponse,
   Case,
+  Scene,
   Suspect,
   DialogueNode,
   EvidenceValidation,
@@ -119,6 +119,10 @@ export async function getScene(
   return request<SceneWithDetails>(
     `/scenes/${sceneId}?gameStateId=${gameStateId}`,
   );
+}
+
+export async function getScenesByCase(caseId: string): Promise<Scene[]> {
+  return request<Scene[]>(`/scenes/case/${caseId}`);
 }
 
 // ========================

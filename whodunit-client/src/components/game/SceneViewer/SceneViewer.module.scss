@@ -1,0 +1,178 @@
+// ========================
+// Viewer — fills all space below the header
+// Split: 66% scene image, 33% text panel
+// ========================
+
+.viewer {
+  display: flex;
+  position: relative;
+  overflow: hidden;
+
+  // ========================
+  // Left side — scene image (66%)
+  // ========================
+
+  .sceneContent {
+    flex: 0 0 66%;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow-y: auto;
+
+    .sceneImage {
+      width: 100%;
+      position: relative;
+      flex-shrink: 0;
+
+      .image {
+        width: 100%;
+        display: block;
+      }
+    }
+
+    // No image yet — dark placeholder
+    .scenePlaceholder {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(ellipse at 50% 40%, #1a1a1a 0%, #0a0a0a 100%);
+
+      .vignette {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          ellipse at 50% 50%,
+          transparent 30%,
+          rgba(0, 0, 0, 0.6) 100%
+        );
+        pointer-events: none;
+      }
+
+      .placeholderInfo {
+        position: relative;
+        z-index: 1;
+        text-align: center;
+        max-width: 400px;
+        padding: 2rem;
+
+        .sceneName {
+          font-family: "Georgia", "Times New Roman", serif;
+          font-size: 1.5rem;
+          font-weight: 400;
+          letter-spacing: 0.15em;
+          text-transform: uppercase;
+          color: #e8d5a3;
+          text-shadow: 0 0 40px rgba(200, 170, 80, 0.2);
+          animation: fadeIn 1s ease-out;
+        }
+      }
+    }
+  }
+
+  // ========================
+  // Right side — text panel (33%)
+  // Scene description, clues found, exits
+  // ========================
+
+  .textPanel {
+    flex: 0 0 34%;
+    display: flex;
+    flex-direction: column;
+    background-color: #0d0d0d;
+    border-left: 1px solid rgba(200, 170, 80, 0.1);
+
+    // Scene description area
+    .description {
+      flex: 1;
+      padding: 2rem 1.5rem;
+      overflow-y: auto;
+
+      .descriptionTitle {
+        font-family: "Georgia", "Times New Roman", serif;
+        font-size: 1.1rem;
+        font-weight: 400;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: #e8d5a3;
+        margin-bottom: 1rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid rgba(200, 170, 80, 0.15);
+        animation: fadeIn 0.8s ease-out;
+      }
+
+      .descriptionText {
+        font-family: "Georgia", "Times New Roman", serif;
+        font-size: 0.9rem;
+        line-height: 1.8;
+        color: #999;
+        font-style: italic;
+        animation: fadeIn 0.8s ease-out 0.2s both;
+      }
+    }
+
+    // Exits — navigation buttons at the bottom
+    .exits {
+      display: flex;
+      gap: 0.5rem;
+      padding: 1rem 1.5rem;
+      border-top: 1px solid rgba(200, 170, 80, 0.1);
+      flex-wrap: wrap;
+
+      .exitButton {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: transparent;
+        cursor: pointer;
+        transition: all 0.3s ease;
+
+        &:hover:not(.locked) {
+          border-color: rgba(200, 170, 80, 0.4);
+          background-color: rgba(200, 170, 80, 0.05);
+
+          .exitLabel {
+            color: #c8aa50;
+          }
+        }
+
+        &.locked {
+          opacity: 0.35;
+          cursor: not-allowed;
+        }
+
+        .exitLabel {
+          font-family: "Georgia", "Times New Roman", serif;
+          font-size: 0.7rem;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          color: #aaa;
+          transition: color 0.3s ease;
+        }
+
+        .lockIcon {
+          font-size: 0.65rem;
+        }
+      }
+    }
+  }
+}
+
+// ========================
+// Animations
+// ========================
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

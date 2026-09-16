@@ -1,10 +1,12 @@
-'use client';
+"use client";
 
-import { useEffect } from 'react';
-import { useParams } from 'next/navigation';
-import { useGameStore } from '@/stores/gameStore';
-import Header from '@/components/game/Header/Header';
-import styles from './page.module.scss';
+import { useEffect } from "react";
+import { useParams } from "next/navigation";
+import { useGameStore } from "@/stores/gameStore";
+import Header from "@/components/game/Header/Header";
+import SceneViewer from "@/components/game/SceneViewer/SceneViewer";
+import ActionBar from "@/app/(game)/ActionBar/ActionBar";
+import styles from "./page.module.scss";
 
 // ========================
 // Game Page — main game screen
@@ -46,12 +48,11 @@ export default function GamePage() {
 
       {/* Scene viewer will go here */}
       <main className={styles.sceneArea}>
-        <p className={styles.placeholder}>
-          Scene viewer coming soon
-        </p>
-      </main>
+        <SceneViewer />
 
-      {/* Bottom action bar will go here */}
+        {/* Action bar */}
+        <ActionBar />
+      </main>
     </div>
   );
 }

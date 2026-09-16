@@ -87,6 +87,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     try {
       const caseData = await api.getCase(caseId);
       const suspects = await api.getSuspects(caseId);
+      const scenes = await api.getScenesByCase(caseId);
 
       // These endpoints might not exist yet — don't fail the whole game
       const audioTracks = await api.getAudio(caseId).catch(() => []);
@@ -114,6 +115,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         caseData,
         gameState: localGameState,
         suspects,
+        scenes,
         audioTracks,
         scriptedEvents,
         loading: false,

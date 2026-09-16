@@ -8,26 +8,21 @@
   height: 100vh;
   background-color: #080808;
   overflow: hidden;
-}
 
-// ========================
-// Scene area — takes up all space
-// below the header
-// ========================
+  .sceneArea {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    align-items: flex-start;
+  }
 
-.sceneArea {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-}
-
-.placeholder {
-  color: #555;
-  font-style: italic;
-  font-size: 1rem;
-  letter-spacing: 0.1em;
+  .placeholder {
+    color: #555;
+    font-style: italic;
+    font-size: 1rem;
+    letter-spacing: 0.1em;
+  }
 }
 
 // ========================
@@ -40,27 +35,26 @@
   justify-content: center;
   height: 100vh;
   background-color: #080808;
-}
 
-.loadingText {
-  color: #777;
-  font-family: 'Georgia', 'Times New Roman', serif;
-  font-style: italic;
-  font-size: 1.1rem;
-  letter-spacing: 0.1em;
+  .loadingText {
+    color: #777;
+    font-family: "Georgia", "Times New Roman", serif;
+    font-style: italic;
+    font-size: 1.1rem;
+    letter-spacing: 0.1em;
+    animation: pulse 2s ease-in-out infinite;
+  }
 
-  // Slow pulse
-  animation: pulse 2s ease-in-out infinite;
-}
-
-.errorText {
-  color: #8b2d2d;
-  font-family: 'Georgia', 'Times New Roman', serif;
-  font-size: 1rem;
+  .errorText {
+    color: #8b2d2d;
+    font-family: "Georgia", "Times New Roman", serif;
+    font-size: 1rem;
+  }
 }
 
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 0.4;
   }
   50% {
