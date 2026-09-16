@@ -3,9 +3,10 @@
 import { useEffect } from "react";
 import { useParams } from "next/navigation";
 import { useGameStore } from "@/stores/gameStore";
-import Header from "@/components/game/Header/Header";
+import Header from "@/components/shared/Header/Header";
 import SceneViewer from "@/components/game/SceneViewer/SceneViewer";
 import ActionBar from "@/app/(game)/ActionBar/ActionBar";
+import Footer from "@/components/shared/Footer/Footer";
 import styles from "./page.module.scss";
 
 // ========================
@@ -52,6 +53,9 @@ export default function GamePage() {
 
         {/* Action bar */}
         <ActionBar />
+
+        {/* Footer */}
+        <Footer />
       </main>
     </div>
   );
