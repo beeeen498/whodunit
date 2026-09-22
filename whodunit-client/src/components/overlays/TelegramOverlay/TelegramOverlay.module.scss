@@ -1,0 +1,111 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.85);
+  z-index: 30;
+  animation: fadeIn 0.5s ease-out;
+
+  .telegram {
+    position: relative;
+    width: 500px;
+    padding: 2.5rem;
+    background-color: #f5e6c8;
+    color: #000000;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    animation: slideUp 0.5s ease-out;
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #2a2a2a;
+      padding-bottom: 0.75rem;
+      margin-bottom: 1.5rem;
+
+      .company {
+        font-family: "Georgia", "Times New Roman", serif;
+        font-size: 1.1rem;
+        font-weight: 700;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+      }
+
+      .type {
+        font-family: "Georgia", "Times New Roman", serif;
+        font-size: 0.7rem;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+      }
+    }
+
+    .body {
+      font-family: "Courier New", monospace;
+      color: black;
+      
+      .date {
+        font-size: 0.75rem;
+        margin-bottom: 1rem;
+        color: black;
+      }
+      
+      .to {
+        font-size: 0.85rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        color: black;
+      }
+
+      .message {
+        font-size: 0.85rem;
+        line-height: 2;
+        margin-bottom: 1.5rem;
+        color: black;
+      }
+
+      .from {
+        font-size: 0.8rem;
+        font-style: italic;
+        color: #666;
+      }
+    }
+
+    .closeBtn {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      font-size: 1rem;
+      color: #888;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      transition: color 0.3s ease;
+
+      &:hover {
+        color: #2a2a2a;
+      }
+    }
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

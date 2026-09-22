@@ -7,6 +7,8 @@ import { create } from "zustand";
 interface TextLine {
   text: string;
   speaker?: string; // "narrator", suspect name, etc.
+  type?: "text" | "name-input";
+  color?: string;
 }
 
 interface TextStore {
@@ -27,6 +29,14 @@ interface TextStore {
   advance: () => void;
   finishTyping: () => void;
   clear: () => void;
+
+  // Skipping the typing effect
+  skipRequested: boolean;
+  requestSkip: () => void;
+
+  // The name the player adds at the start of the game
+  playerName: string | null;
+  setPlayerName: (name: string) => void;
 }
 
 // ========================
@@ -38,6 +48,8 @@ export const useTextStore = create<TextStore>((set, get) => ({
   history: [],
   activeLine: null,
   isTyping: false,
+  skipRequested: false,
+  playerName: null,
 
   // Add new lines to the queue and start
   // typing the first one if nothing is active
@@ -89,7 +101,7 @@ export const useTextStore = create<TextStore>((set, get) => ({
   },
 
   // Called when the typewriter finishes a line
-  finishTyping: () => set({ isTyping: false }),
+  finishTyping: () => set({ isTyping: false, skipRequested: false }),
 
   // Clear everything — on scene change,
   // conversation end, act end
@@ -100,4 +112,10 @@ export const useTextStore = create<TextStore>((set, get) => ({
       activeLine: null,
       isTyping: false,
     }),
+
+  // Sets skipRequested to true again to allow skiiping the next line
+  requestSkip: () => set({ skipRequested: true }),
+
+  // Sets the players name
+  setPlayerName: (name) => set({ playerName: name }),
 }));

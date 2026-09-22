@@ -1,0 +1,52 @@
+.inputWrapper {
+  display: inline-block;
+  animation: fadeIn 0.5s ease-out;
+
+  .input {
+    font-family: "Georgia", "Times New Roman", serif;
+    font-size: 0.9rem;
+    color: #e8d5a3;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid rgba(200, 170, 80, 0.4);
+    outline: none;
+    padding: 0.1rem 0.3rem;
+    width: 150px;
+    caret-color: #c8aa50;
+
+    &::placeholder {
+      color: #555;
+      font-style: italic;
+    }
+  }
+
+  .submitBtn {
+    font-size: 0.85rem;
+    color: #c8aa50;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0 0.3rem;
+    transition: opacity 0.3s ease;
+    animation: fadeIn 0.3s ease-out;
+
+    &:hover {
+      opacity: 0.7;
+    }
+  }
+}
+
+.name {
+  color: #e8d5a3;
+  font-weight: 700;
+  animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

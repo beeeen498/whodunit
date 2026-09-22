@@ -1,0 +1,42 @@
+.devTools {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.8rem;
+  background: rgba(0, 0, 0, 0.9);
+  border-top: 1px solid #333;
+  border-left: 1px solid #333;
+  z-index: 50;
+
+  .label {
+    font-size: 0.6rem;
+    color: #c8aa50;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+  }
+
+  .select {
+    font-size: 0.65rem;
+    padding: 0.2rem;
+    background: #1a1a1a;
+    color: #aaa;
+    border: 1px solid #333;
+  }
+
+  .btn {
+    font-size: 0.6rem;
+    padding: 0.2rem 0.5rem;
+    background: #1a1a1a;
+    color: #aaa;
+    border: 1px solid #333;
+    cursor: pointer;
+
+    &:hover {
+      color: #c8aa50;
+      border-color: #c8aa50;
+    }
+  }
+}

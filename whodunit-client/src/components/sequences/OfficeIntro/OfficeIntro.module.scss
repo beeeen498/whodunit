@@ -1,0 +1,69 @@
+.overlay {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0);
+  transition: background-color 0.5s ease;
+  pointer-events: none;
+  z-index: 1;
+
+  &.focused {
+    background-color: rgba(0, 0, 0, 0.7);
+  }
+}
+
+.messenger {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 70%;
+  z-index: 3;
+  filter: grayscale(80%) contrast(1.1) brightness(0.9);
+  pointer-events: none;
+  opacity: 0;
+  animation: fadeIn 1.5s ease-out forwards;
+}
+
+.doorPlate {
+  position: absolute;
+  top: 22%;
+  left: 49.2%;
+  transform: translateX(-50%) scaleX(-1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  pointer-events: none;
+  max-width: 105px;
+  text-align: center;
+
+  .doorTitle {
+    font-family: "Georgia", "Times New Roman", serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(200, 80, 80, 0.2);
+    text-shadow: 0 0 10px rgba(200, 170, 80, 0.1);
+  }
+
+  .doorName {
+    font-family: "Georgia", "Times New Roman", serif;
+    font-size: 0.9rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(200, 170, 80, 0.25);
+    text-shadow: 0 0 10px rgba(200, 170, 80, 0.1);
+    word-wrap: break-word;
+    opacity: 0;
+    animation: fadeIn 1.5s ease-out forwards;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

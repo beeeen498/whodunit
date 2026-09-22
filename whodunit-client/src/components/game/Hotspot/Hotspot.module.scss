@@ -1,0 +1,74 @@
+.hotspot {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  animation: fadeIn 0.5s ease-out;
+  z-index: 4;
+
+  // Glowing pulse ring
+  .pulse {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 1px solid rgba(200, 170, 80, 0.6);
+    background: rgba(200, 170, 80, 0.15);
+    animation: pulseGlow 2s ease-in-out infinite;
+  }
+
+  .label {
+    font-family: "Georgia", "Times New Roman", serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgb(200, 170, 80);
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+    white-space: nowrap;
+    background: rgba(0, 0, 0, 0.6);
+    padding: 0.2rem 0.5rem;
+  }
+
+  .lock {
+    font-size: 0.6rem;
+  }
+
+  &:hover:not(.locked) {
+    .pulse {
+      background: rgba(200, 170, 80, 0.35);
+      box-shadow: 0 0 15px rgba(200, 170, 80, 0.3);
+    }
+
+    .label {
+      color: #e8d5a3;
+    }
+  }
+
+  &.locked {
+    cursor: not-allowed;
+    opacity: 0.4;
+  }
+}
+
+@keyframes pulseGlow {
+  0%,
+  100% {
+    box-shadow: 0 0 5px rgba(200, 170, 80, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(200, 170, 80, 0.4);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

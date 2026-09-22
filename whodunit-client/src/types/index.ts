@@ -41,6 +41,8 @@ export interface SceneConnection {
   label: string | null;
   is_locked: boolean;
   unlock_clue_id: string | null;
+  x: number;
+  y: number;
 }
 
 export interface Clue {

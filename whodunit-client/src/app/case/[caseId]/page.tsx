@@ -6,6 +6,7 @@ import { useGameStore } from "@/stores/gameStore";
 import Header from "@/components/shared/Header/Header";
 import SceneViewer from "@/components/game/SceneViewer/SceneViewer";
 import ActionBar from "@/app/(game)/ActionBar/ActionBar";
+import DevTools from "@/components/game/DevTools/DevTools";
 import Footer from "@/components/shared/Footer/Footer";
 import styles from "./page.module.scss";
 
@@ -53,6 +54,9 @@ export default function GamePage() {
 
         {/* Action bar */}
         <ActionBar />
+
+        {/* Dev Tools */}
+        <DevTools />
 
         {/* Footer */}
         <Footer />

@@ -1,0 +1,141 @@
+// ========================
+// Cabaret Arrival Sequence Styles
+// ========================
+
+// Dark overlay behind characters — dims the scene
+// so sprites stand out
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0);
+  transition: background 0.8s ease;
+  z-index: 2;
+  pointer-events: none;
+
+  &.focused {
+    background: rgba(0, 0, 0, 0.65);
+  }
+}
+
+// Full black screen for the blackout moment
+.blackout {
+  position: absolute;
+  inset: 0;
+  background: #000;
+  opacity: 0;
+  transition: opacity 1.2s ease;
+  z-index: 10;
+  pointer-events: none;
+
+  &.active {
+    opacity: 1;
+  }
+}
+
+// ========================
+// Full Body Sprites (narration step)
+// Smaller, positioned lower — showing the characters
+// in the cabaret before the dialogue starts
+// ========================
+
+.fullBody {
+  position: absolute;
+  bottom: 0;
+  height: 60%;
+  width: auto;
+  object-fit: contain;
+  z-index: 1;
+  opacity: 0.7;
+  transition: opacity 1s ease;
+}
+
+.fullBodyLeft {
+  left: 15%;
+}
+
+.fullBodyRight {
+  right: 15%;
+}
+
+// ========================
+// Portrait Sprites (dialogue steps)
+// ========================
+
+.character {
+  position: absolute;
+  bottom: 0;
+  height: 85%;
+  width: auto;
+  object-fit: contain;
+  z-index: 3;
+  transition:
+    opacity 0.8s ease,
+    filter 0.5s ease,
+    transform 0.6s ease;
+
+  // Speaking character gets a subtle backlight glow
+  &.speaking {
+    opacity: 1;
+    filter: drop-shadow(0 0 30px rgba(255, 220, 160, 0.3));
+  }
+
+  // Non-speaking characters are dimmed
+  &.dimmed {
+    opacity: 0.5;
+    filter: brightness(0.5);
+  }
+
+  // Fade out — owner running off to see the body
+  &.fadeOut {
+    opacity: 0;
+    transform: translateX(-30px);
+    transition:
+      opacity 1.2s ease,
+      transform 1.2s ease;
+  }
+
+  // Fade in — agnes coming back inside
+  &.fadeIn {
+    animation: characterFadeIn 1.2s ease forwards;
+  }
+}
+
+// ========================
+// Character Positions
+// ========================
+
+// Left side of the scene (owner's usual spot)
+.characterLeft {
+  left: 10%;
+}
+
+// Right side of the scene
+.characterRight {
+  right: 10%;
+}
+
+// Center (used for returns and solo moments)
+.characterCenter {
+  left: 50%;
+  transform: translateX(-50%);
+
+  // Override transform for fadeOut so both apply
+  &.fadeOut {
+    transform: translateX(calc(-50% - 30px));
+  }
+}
+
+// ========================
+// Animations
+// ========================
+
+@keyframes characterFadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}

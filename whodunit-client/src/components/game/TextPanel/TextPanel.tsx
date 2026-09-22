@@ -1,64 +1,108 @@
 "use client";
 
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback, useState } from "react";
 import { useTextStore } from "@/stores/textStore";
 import TypewriterText from "@/components/game/TypewriterText/TypewriterText";
+import NameInput from "@/components/game/NameInput/NameInput";
+import type { TypewriterHandle } from "@/components/game/TypewriterText/TypewriterText";
 import styles from "./TextPanel.module.scss";
 
-// ========================
-// TextPanel — scrollable typewriter text area
-// Shows history + active typing line + continue button
-// ========================
-
 export default function TextPanel() {
-  const { history, activeLine, isTyping, advance, finishTyping } =
+  const { history, activeLine, advance, finishTyping, playerName } =
     useTextStore();
 
-  // Auto-scroll to bottom when new text appears
   const bottomRef = useRef<HTMLDivElement>(null);
+  const typewriterRef = useRef<TypewriterHandle>(null);
+  const [typingDone, setTypingDone] = useState(false);
+  const lastLineRef = useRef<string | null>(null);
+  const [canClick, setCanClick] = useState(false);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [history, activeLine, isTyping]);
+  }, [history, activeLine, typingDone]);
 
-  // Memoize so TypewriterText doesn't re-render
+  // When a new line appears, reset states and delay button
+  useEffect(() => {
+    if (!activeLine) return;
+
+    setTypingDone(false);
+    setCanClick(false);
+
+    const timer = setTimeout(() => setCanClick(true), 1000);
+    return () => clearTimeout(timer);
+  }, [activeLine?.text]);
+
   const handleFinish = useCallback(() => {
     finishTyping();
+    setTypingDone(true);
   }, [finishTyping]);
+
+  const handleButtonClick = () => {
+    if (!typingDone) {
+      typewriterRef.current?.skip();
+    } else {
+      advance();
+    }
+  };
 
   return (
     <div className={styles.panel}>
-      {/* Scrollable text area */}
       <div className={styles.textArea}>
-        {/* Already printed lines */}
         {history.map((line, i) => (
           <div key={i} className={styles.line}>
             {line.speaker && (
-              <span className={styles.speaker}>{line.speaker}</span>
+              <span
+                className={styles.speaker}
+                style={line.color ? { color: line.color } : undefined}
+              >
+                {line.speaker}
+              </span>
             )}
-            <p className={styles.lineText}>{line.text}</p>
+            {line.type === "name-input" ? (
+              <p className={styles.lineText}>
+                You are Detective <strong>{playerName}</strong>.
+              </p>
+            ) : (
+              <p className={styles.lineText}>{line.text}</p>
+            )}
           </div>
         ))}
 
-        {/* Currently typing line */}
         {activeLine && (
           <div className={styles.line}>
             {activeLine.speaker && (
-              <span className={styles.speaker}>{activeLine.speaker}</span>
+              <span
+                className={styles.speaker}
+                style={
+                  activeLine.color ? { color: activeLine.color } : undefined
+                }
+              >
+                {activeLine.speaker}
+              </span>
             )}
-            <TypewriterText text={activeLine.text} onFinish={handleFinish} />
+            {activeLine.type === "name-input" ? (
+              <p className={styles.lineText}>
+                You are Detective <NameInput />
+              </p>
+            ) : (
+              <TypewriterText
+                ref={typewriterRef}
+                text={activeLine.text}
+                onFinish={handleFinish}
+              />
+            )}
           </div>
         )}
 
-        {/* Scroll anchor */}
         <div ref={bottomRef} />
       </div>
 
-      {/* Continue button — shows when typing is done
-          and more lines are queued */}
-      {activeLine && !isTyping && (
-        <button className={styles.continueButton} onClick={advance}>
-          Continue ▸
+      {activeLine && activeLine.type !== "name-input" && (
+        <button
+          className={`${styles.continueButton} ${canClick ? styles.active : ""}`}
+          onClick={canClick ? handleButtonClick : undefined}
+        >
+          {!typingDone ? "Skip ▸" : "Continue ▸"}
         </button>
       )}
     </div>

@@ -1,47 +1,62 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useGameStore } from "@/stores/gameStore";
 import { useTextStore } from "@/stores/textStore";
+import { useUIStore } from "@/stores/uiStore";
 import TextPanel from "@/components/game/TextPanel/TextPanel";
+import Hotspot from "../Hotspot/Hotspot";
+import OfficeIntro from "@/components/sequences/OfficeIntro/OfficeIntro";
+import MapView from "@/components/game/MapView/MapView";
+import CabaretArrival from "@/components/sequences/CabaretArrival/CabaretArrival";
 import styles from "./SceneViewer.module.scss";
-
-// ========================
-// SceneViewer — the main game area
-// Left: scene image (66%), Right: text panel (33%)
-// ========================
 
 export default function SceneViewer() {
   const { scenes, currentScene, currentConnections, loadScene, visitScene } =
     useGameStore();
-  const { addLines, clear } = useTextStore();
+  const { addLines, clear, activeLine, playerName } = useTextStore();
+  const [gameStarted, setGameStarted] = useState(false);
 
-  // On first load, pick the starting scene
-  // (Detective's Office) and load it
+  // Load starting scene after player clicks to begin
   useEffect(() => {
+    if (!gameStarted) return;
     if (scenes.length > 0 && !currentScene) {
       const startScene = scenes.find((s) => s.name === "Detective's Office");
-
       if (startScene) {
         loadScene(startScene.id);
         visitScene(startScene.id);
       }
     }
-  }, [scenes, currentScene, loadScene, visitScene]);
+  }, [scenes, currentScene, gameStarted, loadScene, visitScene]);
 
-  // Clears old text when entering a new scene,and feeds the scene description as a narrator line that types out.
+  // Feed narration for non-sequence scenes
   useEffect(() => {
-    if (currentScene) {
-      clear();
-      addLines([{ text: currentScene.description || "", speaker: "narrator" }]);
-    }
-  }, [currentScene, addLines, clear]);
+    if (!gameStarted || !currentScene) return;
+    // Scenes with sequences handle their own narration
+    if (currentScene.name === "Detective's Office") return;
+    if (currentScene.name === "Main Cabaret") return;
 
-  // Nothing loaded yet
+    clear();
+    addLines([{ text: currentScene.description || "", speaker: "narrator" }]);
+  }, [currentScene, gameStarted, addLines, clear]);
+
+  // Start screen
+  if (!gameStarted) {
+    return (
+      <div className={styles.viewer} style={{ flex: 1 }}>
+        <div
+          className={styles.startScreen}
+          onClick={() => setGameStarted(true)}
+        >
+          <p className={styles.startText}>Click anywhere to begin</p>
+        </div>
+      </div>
+    );
+  }
+
   if (!currentScene) return null;
 
-  // Find scene names for each connection
-  // so exits show "Main Bar" instead of a UUID
+  // Build exit data
   const exits = currentConnections.map((conn) => {
     const targetScene = scenes.find((s) => s.id === conn.scene_id_to);
     return {
@@ -51,23 +66,65 @@ export default function SceneViewer() {
     };
   });
 
-  // Navigate to another scene
-  const handleNavigate = async (sceneId: string) => {
-    await loadScene(sceneId);
-    await visitScene(sceneId);
-  };
+  // Check if current scene has a sequence
+  const isOffice = currentScene.name === "Detective's Office";
+  const isCabaret = currentScene.name === "Main Cabaret";
 
   return (
-    <div className={styles.viewer}>
-      {/* Left — scene image (66%) */}
+    <div
+      className={`${styles.viewer} ${currentScene.type === "map" ? styles.mapMode : ""}`}
+    >
       <div className={styles.sceneContent}>
-        {currentScene.image_url ? (
-          <div className={styles.sceneImage}>
+        {currentScene.type === "map" ? (
+          <MapView exits={exits} />
+        ) : currentScene.image_url ? (
+          <div
+            className={styles.sceneImage}
+            onClick={(e) => {
+              if (e.shiftKey) {
+                const rect = e.currentTarget.getBoundingClientRect();
+                const x = (
+                  ((e.clientX - rect.left) / rect.width) *
+                  100
+                ).toFixed(1);
+                const y = (
+                  ((e.clientY - rect.top) / rect.height) *
+                  100
+                ).toFixed(1);
+                console.log(`x: ${x}, y: ${y}`);
+              }
+            }}
+          >
             <img
               src={currentScene.image_url}
               alt={currentScene.name}
               className={styles.image}
             />
+
+            <div className={styles.vignette} />
+
+            {/* Scene sequence — renders overlays, characters, hotspots */}
+            {isOffice && (
+              <OfficeIntro exits={exits} gameStarted={gameStarted} />
+            )}
+
+            {isCabaret && <CabaretArrival exits={exits} />}
+
+            {/* Default exits for scenes without a sequence */}
+            {!isOffice &&
+              !isCabaret &&
+              !activeLine &&
+              exits.map((exit) => (
+                <Hotspot
+                  key={exit.id}
+                  connectionId={exit.id}
+                  targetSceneId={exit.scene_id_to}
+                  label={exit.label || exit.targetName}
+                  x={exit.x}
+                  y={exit.y}
+                  locked={exit.targetLocked}
+                />
+              ))}
           </div>
         ) : (
           <div className={styles.scenePlaceholder}>
@@ -79,7 +136,6 @@ export default function SceneViewer() {
         )}
       </div>
 
-      {/* Right — text panel (33%) */}
       <TextPanel />
     </div>
   );
