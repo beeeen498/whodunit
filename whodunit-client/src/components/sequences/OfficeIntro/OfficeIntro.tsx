@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useGameStore } from "@/stores/gameStore";
 import { useTextStore } from "@/stores/textStore";
 import { useUIStore } from "@/stores/uiStore";
+import { CHARACTERS } from "@/constants/characters";
 import Hotspot from "@/components/game/Hotspot/Hotspot";
 import TelegramOverlay from "@/components/overlays/TelegramOverlay/TelegramOverlay";
 import styles from "./OfficeIntro.module.scss";
@@ -69,8 +70,8 @@ export default function OfficeIntro({ exits, gameStarted }: OfficeIntroProps) {
       addLines([
         {
           text: `Telegram for Detective ${playerName}. From the operator downtown.`,
-          speaker: "messenger",
-          color: "#8b9dad",
+          speaker: CHARACTERS.messenger.name,
+          color: CHARACTERS.messenger.color,
         },
       ]);
     }, 1500);
@@ -86,7 +87,7 @@ export default function OfficeIntro({ exits, gameStarted }: OfficeIntroProps) {
       {/* Messenger image */}
       {(officeStep === "messenger" || officeStep === "telegram") && (
         <img
-          src="/assets/images/characters/messenger.png"
+          src={CHARACTERS.messenger.portrait}
           alt="Telegram messenger"
           className={styles.messenger}
         />

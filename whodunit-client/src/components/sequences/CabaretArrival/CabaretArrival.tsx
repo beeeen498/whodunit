@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useGameStore } from "@/stores/gameStore";
 import { useTextStore } from "@/stores/textStore";
 import { useUIStore } from "@/stores/uiStore";
+import { CHARACTERS } from "@/constants/characters";
 import Hotspot from "@/components/game/Hotspot/Hotspot";
 import styles from "./CabaretArrival.module.scss";
 
@@ -53,7 +54,7 @@ export default function CabaretArrival({ exits }: CabaretArrivalProps) {
     addLines([
       {
         text: "The Blue Moon Cabaret. Seems like they're closing for the evening. Ten years ago, this place used to be packed to the gills. But since the prohibition laws, they, like many other places, struggle to stay afloat. Nonetheless, it doesn't seem like any tragedy has happened yet.",
-        speaker: "narrator",
+        speaker: CHARACTERS.narrator.name,
       },
     ]);
   }, [cabaretStep, currentScene]);
@@ -71,23 +72,23 @@ export default function CabaretArrival({ exits }: CabaretArrivalProps) {
     addLines([
       {
         text: "I heard a woman yelling... there are noises coming from the dressing room.",
-        speaker: "Walter",
-        color: "#c4a882",
+        speaker: CHARACTERS.walter.name,
+        color: CHARACTERS.walter.color,
       },
       {
-        text: "It was the singer.",
-        speaker: "Agnes",
-        color: "#8b9dad",
+        text: "It was Clara.",
+        speaker: CHARACTERS.agnes.name,
+        color: CHARACTERS.agnes.color,
       },
       {
-        text: "The singer? What is she doing here? It's her night off.",
-        speaker: "Walter",
-        color: "#c4a882",
+        text: "Clara? She's not performing tonight — it's her night off.",
+        speaker: CHARACTERS.walter.name,
+        color: CHARACTERS.walter.color,
       },
       {
         text: "She's searching for her bracelet.",
-        speaker: "Agnes",
-        color: "#8b9dad",
+        speaker: CHARACTERS.agnes.name,
+        color: CHARACTERS.agnes.color,
       },
     ]);
   }, [cabaretStep, currentScene]);
@@ -104,13 +105,13 @@ export default function CabaretArrival({ exits }: CabaretArrivalProps) {
     addLines([
       {
         text: "We have a late guest.",
-        speaker: "Agnes",
-        color: "#8b9dad",
+        speaker: CHARACTERS.agnes.name,
+        color: CHARACTERS.agnes.color,
       },
       {
         text: "I'm going to throw out the trash.",
-        speaker: "Agnes",
-        color: "#8b9dad",
+        speaker: CHARACTERS.agnes.name,
+        color: CHARACTERS.agnes.color,
       },
     ]);
   }, [cabaretStep]);
@@ -127,8 +128,8 @@ export default function CabaretArrival({ exits }: CabaretArrivalProps) {
     addLines([
       {
         text: `D-Detective ${playerName}! What are you doing here? We haven't seen you since... we haven't seen you here in quite some time.`,
-        speaker: "Walter",
-        color: "#c4a882",
+        speaker: CHARACTERS.walter.name,
+        color: CHARACTERS.walter.color,
       },
       {
         text: "Well, I got a—",
@@ -153,8 +154,8 @@ export default function CabaretArrival({ exits }: CabaretArrivalProps) {
       addLines([
         {
           text: "I'll go turn on the fuse.",
-          speaker: "Tom",
-          color: "#a0b0a0",
+          speaker: CHARACTERS.tom.name,
+          color: CHARACTERS.tom.color,
         },
       ]);
     }, 2000);
@@ -178,8 +179,8 @@ export default function CabaretArrival({ exits }: CabaretArrivalProps) {
       addLines([
         {
           text: "AHHH!",
-          speaker: "Tom",
-          color: "#a0b0a0",
+          speaker: CHARACTERS.tom.name,
+          color: CHARACTERS.tom.color,
         },
       ]);
     }, 500);
@@ -233,7 +234,7 @@ export default function CabaretArrival({ exits }: CabaretArrivalProps) {
 
       // Bartender said he'll fix fuse → lights come back
       case "blackout":
-        if (history.some((l) => l.speaker === "Tom")) {
+        if (history.some((l) => l.speaker === CHARACTERS.tom.name)) {
           setTimeout(() => setCabaretStep("discovery"), 1500);
         }
         break;
@@ -246,9 +247,9 @@ export default function CabaretArrival({ exits }: CabaretArrivalProps) {
           focusCharacter("owner");
           addLines([
             {
-              text: "What is it, Tom?!",
-              speaker: "Walter",
-              color: "#c4a882",
+              text: `What is it, ${CHARACTERS.tom.name}?!`,
+              speaker: CHARACTERS.walter.name,
+              color: CHARACTERS.walter.color,
             },
           ]);
         } else if (
@@ -262,8 +263,8 @@ export default function CabaretArrival({ exits }: CabaretArrivalProps) {
             addLines([
               {
                 text: "I was outside when I heard people yelling. What happened?",
-                speaker: "Agnes",
-                color: "#8b9dad",
+                speaker: CHARACTERS.agnes.name,
+                color: CHARACTERS.agnes.color,
               },
             ]);
           }, 1500);
@@ -317,13 +318,13 @@ export default function CabaretArrival({ exits }: CabaretArrivalProps) {
       {cabaretStep === "narration" && (
         <>
           <img
-            src="/assets/images/characters/owner-full-body.png"
-            alt="Walter Goss"
+            src={CHARACTERS.walter.fullBody}
+            alt={CHARACTERS.walter.name}
             className={`${styles.fullBody} ${styles.fullBodyLeft}`}
           />
           <img
-            src="/assets/images/characters/wife-full-body.png"
-            alt="Agnes Mott"
+            src={CHARACTERS.agnes.fullBody}
+            alt={CHARACTERS.agnes.name}
             className={`${styles.fullBody} ${styles.fullBodyRight}`}
           />
         </>
@@ -337,8 +338,8 @@ export default function CabaretArrival({ exits }: CabaretArrivalProps) {
         (cabaretStep === "discovery" && discoveryPhase <= 1)) &&
         !isBlackout && (
           <img
-            src="/assets/images/characters/owner-portrait.png"
-            alt="Walter Goss"
+            src={CHARACTERS.walter.portrait}
+            alt={CHARACTERS.walter.name}
             className={`${styles.character} ${styles.characterLeft} ${
               focusedCharacter === "owner" ? styles.speaking : styles.dimmed
             } ${
@@ -355,8 +356,8 @@ export default function CabaretArrival({ exits }: CabaretArrivalProps) {
         (cabaretStep === "discovery" && discoveryPhase >= 2)) &&
         !isBlackout && (
           <img
-            src="/assets/images/characters/wife-portrait.png"
-            alt="Agnes Mott"
+            src={CHARACTERS.agnes.portrait}
+            alt={CHARACTERS.agnes.name}
             className={`${styles.character} ${
               cabaretStep === "discovery"
                 ? styles.characterCenter
@@ -374,8 +375,8 @@ export default function CabaretArrival({ exits }: CabaretArrivalProps) {
       {/* Tom (bartender) — visible during discovery phase 0 */}
       {cabaretStep === "discovery" && discoveryPhase === 0 && (
         <img
-          src="/assets/images/characters/tom-portrait.png"
-          alt="Tom Webber"
+          src={CHARACTERS.tom.portrait}
+          alt={CHARACTERS.tom.name}
           className={`${styles.character} ${styles.characterCenter} ${
             focusedCharacter === "tom" ? styles.speaking : styles.dimmed
           }`}
