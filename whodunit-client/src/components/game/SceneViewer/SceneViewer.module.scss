@@ -3,6 +3,8 @@
   position: relative;
   overflow: hidden;
   width: 100%;
+  flex: 1;
+  min-height: 0;
 
   &.mapMode {
     flex: 1;

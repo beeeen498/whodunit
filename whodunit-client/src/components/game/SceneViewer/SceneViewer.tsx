@@ -34,7 +34,7 @@ export default function SceneViewer() {
     if (!gameStarted || !currentScene) return;
     // Scenes with sequences handle their own narration
     if (currentScene.name === "Detective's Office") return;
-    if (currentScene.name === "Main Cabaret") return;
+    if (currentScene.name === "The Blue Moon Cabaret") return;
 
     clear();
     addLines([{ text: currentScene.description || "", speaker: "narrator" }]);
@@ -68,7 +68,7 @@ export default function SceneViewer() {
 
   // Check if current scene has a sequence
   const isOffice = currentScene.name === "Detective's Office";
-  const isCabaret = currentScene.name === "Main Cabaret";
+  const isCabaret = currentScene.name === "The Blue Moon Cabaret";
 
   return (
     <div

@@ -34,8 +34,6 @@ export default function TelegramOverlay() {
           <p className={styles.message}>
             COME TO THE BLUE MOON CABARET STOP
             <br />
-            5TH AND VINE STOP
-            <br />
             SOMETHING BAD IS ABOUT TO HAPPEN STOP
             <br />
             COME QUICKLY STOP

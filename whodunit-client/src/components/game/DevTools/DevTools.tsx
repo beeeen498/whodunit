@@ -44,7 +44,7 @@ export default function DevTools() {
 
   const handleResetCabaret = () => {
     setCabaretStep("arrival");
-    const Cabaret = scenes.find((s) => s.name === "Main Cabaret");
+    const Cabaret = scenes.find((s) => s.name === "The Blue Moon Cabaret");
     if (Cabaret) {
       clear();
       focusCharacter(null);
@@ -55,7 +55,7 @@ export default function DevTools() {
 
   // Which scene are we in?
   const isOffice = currentScene?.name === "Detective's Office";
-  const isCabaret = currentScene?.name === "Main Cabaret";
+  const isCabaret = currentScene?.name === "The Blue Moon Cabaret";
 
   return (
     <div className={styles.devTools}>
