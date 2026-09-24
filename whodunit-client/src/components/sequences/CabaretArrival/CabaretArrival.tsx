@@ -169,12 +169,22 @@ export default function CabaretArrival({ exits }: CabaretArrivalProps) {
     setTimeout(() => {
       addLines([
         {
-          text: "Damn fuse blew again.",
+          text: "Damn fuse blew again, Walter. Third day in a row at the same time.",
           speaker: "Tom (bartender)",
           color: CHARACTERS.tom.color,
         },
         {
-          text: "Hold on — I'll go flip it back.",
+          text: "I'm telling you, it's that heater in the basement that you can't turn off. It sucks all the power.",
+          speaker: "Tom",
+          color: CHARACTERS.tom.color,
+        },
+        {
+          text: `Just go flip the fuse back, Tom...`,
+          speaker: CHARACTERS.walter.name,
+          color: CHARACTERS.walter.color,
+        },
+        {
+          text: "Fine.",
           speaker: CHARACTERS.tom.name,
           color: CHARACTERS.tom.color,
         },
@@ -265,7 +275,7 @@ export default function CabaretArrival({ exits }: CabaretArrivalProps) {
 
       // Bartender said he'll fix fuse → lights come back
       case "blackout":
-        if (history.some((l) => l.text?.includes("flip it back"))) {
+        if (history.some((l) => l.text === "Fine.")) {
           setTimeout(() => setCabaretStep("discovery"), 1500);
         }
         break;
@@ -405,14 +415,16 @@ export default function CabaretArrival({ exits }: CabaretArrivalProps) {
       {(["arrival", "agnes-exit", "owner-talk", "blackout"].includes(
         cabaretStep,
       ) ||
-        (cabaretStep === "discovery" &&
-          discoveryPhase >= 1 &&
-          discoveryPhase <= 2)) && (
+        (cabaretStep === "discovery" && discoveryPhase <= 2)) && (
         <img
           src={CHARACTERS.walter.portrait}
           alt={CHARACTERS.walter.name}
           className={`${styles.character} ${styles.characterLeft} ${
-            focusedCharacter === "owner" ? styles.speaking : styles.dimmed
+            focusedCharacter === "owner"
+              ? styles.speaking
+              : focusedCharacter
+                ? styles.dimmed
+                : ""
           } ${
             cabaretStep === "discovery" && discoveryPhase === 2
               ? styles.fadeOut
@@ -436,7 +448,11 @@ export default function CabaretArrival({ exits }: CabaretArrivalProps) {
               ? styles.characterCenter
               : styles.characterRight
           } ${
-            focusedCharacter === "agnes" ? styles.speaking : styles.dimmed
+            focusedCharacter === "agnes"
+              ? styles.speaking
+              : focusedCharacter
+                ? styles.dimmed
+                : ""
           } ${agnesLeaving ? styles.fadeOut : ""} ${
             cabaretStep === "discovery" && discoveryPhase === 3
               ? styles.fadeIn
