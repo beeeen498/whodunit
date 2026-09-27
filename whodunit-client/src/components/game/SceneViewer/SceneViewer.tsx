@@ -9,6 +9,7 @@ import Hotspot from "../Hotspot/Hotspot";
 import OfficeIntro from "@/components/sequences/OfficeIntro/OfficeIntro";
 import MapView from "@/components/game/MapView/MapView";
 import CabaretArrival from "@/components/sequences/CabaretArrival/CabaretArrival";
+import DressingRoomScene from "@/components/sequences/DressingRoomScene/DressingRoomScene";
 import styles from "./SceneViewer.module.scss";
 
 export default function SceneViewer() {
@@ -32,9 +33,9 @@ export default function SceneViewer() {
   // Feed narration for non-sequence scenes
   useEffect(() => {
     if (!gameStarted || !currentScene) return;
-    // Scenes with sequences handle their own narration
     if (currentScene.name === "Detective's Office") return;
     if (currentScene.name === "The Blue Moon Cabaret") return;
+    if (currentScene.name === "Dressing Room") return; // add this line
 
     clear();
     addLines([{ text: currentScene.description || "", speaker: "narrator" }]);
@@ -66,9 +67,9 @@ export default function SceneViewer() {
     };
   });
 
-  // Check if current scene has a sequence
   const isOffice = currentScene.name === "Detective's Office";
   const isCabaret = currentScene.name === "The Blue Moon Cabaret";
+  const isDressingRoom = currentScene.name === "Dressing Room";
 
   return (
     <div
@@ -110,9 +111,12 @@ export default function SceneViewer() {
 
             {isCabaret && <CabaretArrival exits={exits} />}
 
+            {isDressingRoom && <DressingRoomScene />}
+
             {/* Default exits for scenes without a sequence */}
             {!isOffice &&
               !isCabaret &&
+              !isDressingRoom && // add this line
               !activeLine &&
               exits.map((exit) => (
                 <Hotspot
