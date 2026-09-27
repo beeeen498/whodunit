@@ -10,7 +10,8 @@ export default function DevTools() {
 
   const { currentScene, scenes, loadScene, visitScene } = useGameStore();
   const { clear } = useTextStore();
-  const { setOfficeStep, setCabaretStep, focusCharacter } = useUIStore();
+  const { setOfficeStep, setCabaretStep, setDressingStep, focusCharacter } =
+    useUIStore();
 
   // ========================
   // Scene jumping
@@ -53,9 +54,25 @@ export default function DevTools() {
     }
   };
 
+  // ========================
+  // Dressing Room sequence controls
+  // ========================
+
+  const handleResetDressing = () => {
+    setDressingStep("narration");
+    const dressingRoom = scenes.find((s) => s.name === "Dressing Room");
+    if (dressingRoom) {
+      clear();
+      focusCharacter(null);
+      loadScene(dressingRoom.id);
+      visitScene(dressingRoom.id);
+    }
+  };
+
   // Which scene are we in?
   const isOffice = currentScene?.name === "Detective's Office";
   const isCabaret = currentScene?.name === "The Blue Moon Cabaret";
+  const isDressingRoom = currentScene?.name === "Dressing Room";
 
   return (
     <div className={styles.devTools}>
@@ -170,6 +187,85 @@ export default function DevTools() {
             onClick={() => {
               clear();
               setCabaretStep("done");
+              focusCharacter(null);
+            }}
+          >
+            → Done
+          </button>
+        </>
+      )}
+
+      {/* ---- Dressing Room Controls ---- */}
+      {isDressingRoom && (
+        <>
+          <button className={styles.btn} onClick={handleResetDressing}>
+            Reset Dressing Room
+          </button>
+          <button
+            className={styles.btn}
+            onClick={() => {
+              clear();
+              setDressingStep("narration");
+              focusCharacter(null);
+            }}
+          >
+            → Narration
+          </button>
+          <button
+            className={styles.btn}
+            onClick={() => {
+              clear();
+              setDressingStep("order");
+              focusCharacter(null);
+            }}
+          >
+            → Order
+          </button>
+          <button
+            className={styles.btn}
+            onClick={() => {
+              clear();
+              setDressingStep("choice");
+              focusCharacter(null);
+            }}
+          >
+            → Choice
+          </button>
+          <button
+            className={styles.btn}
+            onClick={() => {
+              clear();
+              setDressingStep("lie");
+              focusCharacter("agnes");
+            }}
+          >
+            → Lie
+          </button>
+          <button
+            className={styles.btn}
+            onClick={() => {
+              clear();
+              setDressingStep("talk");
+              focusCharacter(null);
+            }}
+          >
+            → Talk
+          </button>
+          <button
+            className={styles.btn}
+            onClick={() => {
+              clear();
+              setDressingStep("investigating");
+              focusCharacter(null);
+            }}
+          >
+            → Investigating
+          </button>
+          <button
+            className={styles.btn}
+            onClick={() => {
+              clear();
+              setDressingStep("done");
               focusCharacter(null);
             }}
           >

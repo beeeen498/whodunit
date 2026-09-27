@@ -99,7 +99,7 @@ export default function CabaretArrival({ exits }: CabaretArrivalProps) {
         color: CHARACTERS.walter.color,
       },
       {
-        text: "No idea... I was cleaning the bathroom when it happened.",
+        text: "No idea... I was cleaning the bathroom when it happened. But I think it's better if we let her be.",
         speaker: CHARACTERS.agnes.name,
         color: CHARACTERS.agnes.color,
       },
@@ -240,7 +240,7 @@ export default function CabaretArrival({ exits }: CabaretArrivalProps) {
 
       // Arrival done → agnes notices player
       case "arrival":
-        if (history.some((l) => l.text?.includes("cleaning the bathroom"))) {
+        if (history.some((l) => l.text?.includes("we let her be."))) {
           setCabaretStep("agnes-exit");
         }
         break;

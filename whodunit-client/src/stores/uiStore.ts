@@ -23,6 +23,16 @@ type CabaretStep =
   | "discovery" // lights on, bartender yells, owner runs, agnes returns
   | "done"; // hotspot to dressing room
 
+// Dressing room discovery sequence steps
+type DressingStep =
+  | "narration" // body found, Tom/Walter/Agnes react
+  | "order" // "don't touch anything," Agnes volunteers, Walter's outburst
+  | "choice" // player picks calm or aggressive response
+  | "lie" // Agnes's fuse lie, "no one leaves"
+  | "talk" // suspect statements + Harold enters
+  | "investigating" // body hotspot active, clue search open
+  | "done"; // all 7 clues found, exit unlocked
+
 interface UIStore {
   // Panels & modals
   activePanel: Panel;
@@ -60,6 +70,10 @@ interface UIStore {
   // Cabaret arrival sequence
   cabaretStep: CabaretStep;
   setCabaretStep: (step: CabaretStep) => void;
+
+  // Dressing room discovery sequence
+  dressingStep: DressingStep;
+  setDressingStep: (step: DressingStep) => void;
 }
 
 // ========================
@@ -78,6 +92,7 @@ export const useUIStore = create<UIStore>((set, get) => ({
   // Sequence steps
   officeStep: "narration",
   cabaretStep: "narration",
+  dressingStep: "narration",
 
   openPanel: (panel) => set({ activePanel: panel }),
   closePanel: () => set({ activePanel: "none" }),
@@ -104,4 +119,6 @@ export const useUIStore = create<UIStore>((set, get) => ({
 
   setOfficeStep: (step) => set({ officeStep: step }),
   setCabaretStep: (step) => set({ cabaretStep: step }),
+
+  setDressingStep: (step) => set({ dressingStep: step }),
 }));
