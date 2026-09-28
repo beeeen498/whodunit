@@ -64,13 +64,13 @@ export default function CabaretArrival({ exits }: CabaretArrivalProps) {
 
   // ========================
   // Step: ARRIVAL
-  // Owner and Agnes are talking when the player walks in
+  // Walter and Agnes are talking when the player walks in
   // ========================
   useEffect(() => {
     if (cabaretStep !== "arrival" || !currentScene) return;
 
     clear();
-    focusCharacter("owner");
+    focusCharacter("walter");
 
     addLines([
       {
@@ -142,7 +142,7 @@ export default function CabaretArrival({ exits }: CabaretArrivalProps) {
   useEffect(() => {
     if (cabaretStep !== "owner-talk") return;
 
-    focusCharacter("owner");
+    focusCharacter("walter");
 
     addLines([
       {
@@ -285,7 +285,7 @@ export default function CabaretArrival({ exits }: CabaretArrivalProps) {
         // Phase 0 → 1: tom screamed, owner reacts
         if (discoveryPhase === 0 && history.some((l) => l.text === "AHHH!")) {
           setDiscoveryPhase(1);
-          focusCharacter("owner");
+          focusCharacter("walter");
           addLines([
             {
               text: `What is it, ${CHARACTERS.tom.name}?!`,
@@ -367,7 +367,7 @@ export default function CabaretArrival({ exits }: CabaretArrivalProps) {
     if (cabaretStep === "narration") return;
 
     const speaker = activeLine.speaker.toLowerCase();
-    if (speaker.includes("walter")) focusCharacter("owner");
+    if (speaker.includes("walter")) focusCharacter("walter");
     else if (speaker.includes("agnes")) focusCharacter("agnes");
     else if (speaker.includes("tom")) focusCharacter("tom");
   }, [activeLine, cabaretStep]);
@@ -420,7 +420,7 @@ export default function CabaretArrival({ exits }: CabaretArrivalProps) {
           src={CHARACTERS.walter.portrait}
           alt={CHARACTERS.walter.name}
           className={`${styles.character} ${styles.characterLeft} ${
-            focusedCharacter === "owner"
+            focusedCharacter === "walter"
               ? styles.speaking
               : focusedCharacter
                 ? styles.dimmed

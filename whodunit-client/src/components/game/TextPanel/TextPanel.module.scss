@@ -40,6 +40,28 @@
     }
   }
 
+  .choiceOptions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+
+    .choiceOptionBtn {
+      background: rgba(0, 0, 0, 0.6);
+      color: #f0f0f0;
+      border: 1px solid #666;
+      padding: 0.6rem 1rem;
+      text-align: left;
+      cursor: pointer;
+      font-family: inherit;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: #999;
+      }
+    }
+  }
+
   .continueButton {
     flex-shrink: 0;
     padding: 0.8rem;

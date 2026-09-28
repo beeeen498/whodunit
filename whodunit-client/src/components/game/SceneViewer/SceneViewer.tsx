@@ -35,7 +35,7 @@ export default function SceneViewer() {
     if (!gameStarted || !currentScene) return;
     if (currentScene.name === "Detective's Office") return;
     if (currentScene.name === "The Blue Moon Cabaret") return;
-    if (currentScene.name === "Dressing Room") return; // add this line
+    if (currentScene.name === "Dressing Room") return; 
 
     clear();
     addLines([{ text: currentScene.description || "", speaker: "narrator" }]);

@@ -7,8 +7,10 @@ import { create } from "zustand";
 interface TextLine {
   text: string;
   speaker?: string; // "narrator", suspect name, etc.
-  type?: "text" | "name-input";
+  type?: "text" | "name-input" | "choice";
   color?: string;
+  options?: { label: string; value: string }[];
+  onChoose?: (value: string) => void;
 }
 
 interface TextStore {

@@ -84,6 +84,21 @@ export default function TextPanel() {
               <p className={styles.lineText}>
                 You are Detective <NameInput />
               </p>
+            ) : activeLine.type === "choice" ? (
+              <div className="choiceOptions">
+                {activeLine.options?.map((opt) => (
+                  <button
+                    key={opt.value}
+                    className="choiceOptionBtn"
+                    onClick={() => {
+                      activeLine.onChoose?.(opt.value);
+                      advance();
+                    }}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
             ) : (
               <TypewriterText
                 ref={typewriterRef}
@@ -97,14 +112,16 @@ export default function TextPanel() {
         <div ref={bottomRef} />
       </div>
 
-      {activeLine && activeLine.type !== "name-input" && (
-        <button
-          className={`${styles.continueButton} ${canClick ? styles.active : ""}`}
-          onClick={canClick ? handleButtonClick : undefined}
-        >
-          {!typingDone ? "Skip ▸" : "Continue ▸"}
-        </button>
-      )}
+      {activeLine &&
+        activeLine.type !== "name-input" &&
+        activeLine.type !== "choice" && (
+          <button
+            className={`${styles.continueButton} ${canClick ? styles.active : ""}`}
+            onClick={canClick ? handleButtonClick : undefined}
+          >
+            {!typingDone ? "Skip ▸" : "Continue ▸"}
+          </button>
+        )}
     </div>
   );
 }
