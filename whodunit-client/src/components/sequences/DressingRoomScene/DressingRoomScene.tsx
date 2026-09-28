@@ -8,9 +8,38 @@ import styles from "./DressingRoomScene.module.scss";
 
 export default function DressingRoomScene() {
   const { addLines, clear, activeLine, playerName } = useTextStore();
+  const [hoveredSuspect, setHoveredSuspect] = useState<string | null>(null);
   const [agnesAway, setAgnesAway] = useState(false);
   const { dressingStep, setDressingStep, focusCharacter, focusedCharacter } =
     useUIStore();
+
+  const suspectStatements: Record<
+    string,
+    { text: string; color: string; name: string }
+  > = {
+    walter: {
+      name: CHARACTERS.walter.name,
+      text: "I was with you in the main hall when the power went out, and then I heard Tom yelling.",
+      color: CHARACTERS.walter.color,
+    },
+    agnes: {
+      name: CHARACTERS.agnes.name,
+      text: "I was outside. I heard yelling and came back in.",
+      color: CHARACTERS.agnes.color,
+    },
+  };
+
+  const handleTalk = (id: string) => {
+    const statement = suspectStatements[id];
+    if (!statement) return;
+    addLines([
+      {
+        text: statement.text,
+        speaker: statement.name,
+        color: statement.color,
+      },
+    ]);
+  };
 
   // ========================
   // Auto-focus: highlight whoever is speaking
@@ -181,6 +210,26 @@ export default function DressingRoomScene() {
   }, [activeLine, dressingStep]);
 
   // ========================
+  // Step: TALK
+  // Player can click Tom/Walter/Agnes for their short
+  // statements, in any order, replayable
+  // ========================
+  useEffect(() => {
+    if (dressingStep !== "talk") return;
+
+    clear();
+    focusCharacter(null);
+
+    addLines([
+      {
+        text: "Until the police get here, I should talk to everyone and take a proper look around.",
+        speaker: `Detective ${playerName}`,
+        color: CHARACTERS.detective.color,
+      },
+    ]);
+  }, [dressingStep, playerName]);
+
+  // ========================
   // Auto-advance: watches for text completion
   // and moves to the next step
   // ========================
@@ -205,11 +254,11 @@ export default function DressingRoomScene() {
         }
         break;
 
-      // "lie" step ends with "everyone is a suspect" —
-      // next step (talk) is built in a later session, so
-      // for now we just stop advancing here.
+      // Lie done → move to talk
       case "lie":
-        // Intentionally left without a next step yet.
+        if (history.some((l) => l.text?.includes("suspect in a murder"))) {
+          setDressingStep("talk");
+        }
         break;
     }
   }, [activeLine, dressingStep]);
@@ -268,7 +317,34 @@ export default function DressingRoomScene() {
           />
         </>
       )}
-      {/* ---- Suspect talk + body hotspot go here (next session) ---- */}
+
+      {/* ---- FULL BODY SPRITES (talk step, clickable) ---- */}
+      {dressingStep === "talk" && (
+        <>
+          <img
+            src={CHARACTERS.walter.fullBody}
+            alt={CHARACTERS.walter.name}
+            className={`character ${styles.characterLeft} clickable ${
+              hoveredSuspect === "walter" ? "hoverGlow" : ""
+            }`}
+            onMouseEnter={() => setHoveredSuspect("walter")}
+            onMouseLeave={() => setHoveredSuspect(null)}
+            onClick={() => handleTalk("walter")}
+          />
+          <img
+            src={CHARACTERS.agnes.fullBody}
+            alt={CHARACTERS.agnes.name}
+            className={`character ${styles.characterCenter} clickable ${
+              hoveredSuspect === "agnes" ? "hoverGlow" : ""
+            }`}
+            onMouseEnter={() => setHoveredSuspect("agnes")}
+            onMouseLeave={() => setHoveredSuspect(null)}
+            onClick={() => handleTalk("agnes")}
+          />
+        </>
+      )}
+
+      {/* ---- Body hotspot goes here (next session) ---- */}
     </>
   );
 }
