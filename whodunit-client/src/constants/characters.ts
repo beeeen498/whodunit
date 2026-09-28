@@ -32,8 +32,8 @@ export const CHARACTERS = {
   tom: {
     name: "Tom",
     color: "#9bbf7e", // muted olive green
-    portrait: "/assets/images/characters/tom-portrait.png",
-    fullBody: "/assets/images/characters/tom-full-body.png",
+    portrait: "/assets/images/characters/bartender-portrait.png",
+    fullBody: "/assets/images/characters/bartender-full-body.png",
   },
   harold: {
     name: "Harold",

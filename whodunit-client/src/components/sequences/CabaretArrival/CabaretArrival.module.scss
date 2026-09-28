@@ -57,6 +57,17 @@
   right: 15%;
 }
 
+.cutPortrait {
+  position: absolute;
+  bottom: 0;
+  height: 35%;
+  width: auto;
+  object-fit: contain;
+  z-index: 1;
+  opacity: 0.7;
+  transition: opacity 1s ease;
+}
+
 // ========================
 // Portrait Sprites (dialogue steps)
 // ========================
@@ -64,7 +75,7 @@
 .character {
   position: absolute;
   bottom: 0;
-  height: 85%;
+  height: 65%;
   width: auto;
   object-fit: contain;
   z-index: 3;
@@ -87,11 +98,7 @@
 
   // Fade out — owner running off to see the body
   &.fadeOut {
-    opacity: 0;
-    transform: translateX(-30px);
-    transition:
-      opacity 1.2s ease,
-      transform 1.2s ease;
+    animation: characterFadeOut 1.2s ease forwards;
   }
 
   // Fade in — agnes coming back inside
@@ -106,12 +113,12 @@
 
 // Left side of the scene (owner's usual spot)
 .characterLeft {
-  left: 10%;
+  left: 20%;
 }
 
 // Right side of the scene
 .characterRight {
-  right: 10%;
+  right: 20%;
 }
 
 // Center (used for returns and solo moments)
@@ -119,9 +126,12 @@
   left: 50%;
   transform: translateX(-50%);
 
-  // Override transform for fadeOut so both apply
+  &.fadeIn {
+    animation: characterFadeInCenter 1.2s ease forwards;
+  }
+
   &.fadeOut {
-    transform: translateX(calc(-50% - 30px));
+    animation: characterFadeOutCenter 1.2s ease forwards;
   }
 }
 
@@ -137,5 +147,38 @@
   to {
     opacity: 1;
     transform: translateX(0);
+  }
+}
+
+@keyframes characterFadeOut {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+}
+
+@keyframes characterFadeInCenter {
+  from {
+    opacity: 0;
+    transform: translateX(calc(-50% + 30px));
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes characterFadeOutCenter {
+  from {
+    opacity: 1;
+    transform: translateX(-50%);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(calc(-50% - 30px));
   }
 }

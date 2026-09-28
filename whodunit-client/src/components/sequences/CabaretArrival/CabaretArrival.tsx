@@ -27,6 +27,7 @@ interface CabaretArrivalProps {
 export default function CabaretArrival({ exits }: CabaretArrivalProps) {
   const { currentScene } = useGameStore();
   const { addLines, clear, activeLine, playerName } = useTextStore();
+  const [tomGone, setTomGone] = useState(false);
   const { cabaretStep, setCabaretStep, focusCharacter, focusedCharacter } =
     useUIStore();
 
@@ -164,6 +165,7 @@ export default function CabaretArrival({ exits }: CabaretArrivalProps) {
   // ========================
   useEffect(() => {
     if (cabaretStep !== "blackout") return;
+    setTomGone(true);
 
     // 2 second pause in total darkness before bartender speaks
     setTimeout(() => {
@@ -352,7 +354,8 @@ export default function CabaretArrival({ exits }: CabaretArrivalProps) {
           discoveryPhase === 4 &&
           history.some((l) => l.text === "No... Clara!")
         ) {
-          setCabaretStep("done");
+          setDiscoveryPhase(5);
+          setTimeout(() => setCabaretStep("done"), 1500);
         }
         break;
     }
@@ -396,12 +399,15 @@ export default function CabaretArrival({ exits }: CabaretArrivalProps) {
           <img
             src={CHARACTERS.walter.fullBody}
             alt={CHARACTERS.walter.name}
-            className={`${styles.fullBody} ${styles.fullBodyLeft}`}
+            className={styles.fullBody}
+            style={{ left: "30.5%" }}
           />
+
           <img
             src={CHARACTERS.agnes.fullBody}
             alt={CHARACTERS.agnes.name}
-            className={`${styles.fullBody} ${styles.fullBodyRight}`}
+            className={styles.fullBody}
+            style={{ left: "45.5%" }}
           />
         </>
       )}
@@ -439,7 +445,7 @@ export default function CabaretArrival({ exits }: CabaretArrivalProps) {
       {(["arrival", "agnes-exit"].includes(cabaretStep) ||
         (cabaretStep === "discovery" &&
           discoveryPhase >= 3 &&
-          discoveryPhase <= 4)) && (
+          discoveryPhase <= 5)) && (
         <img
           src={CHARACTERS.agnes.portrait}
           alt={CHARACTERS.agnes.name}
@@ -458,7 +464,8 @@ export default function CabaretArrival({ exits }: CabaretArrivalProps) {
               ? styles.fadeIn
               : ""
           } ${
-            cabaretStep === "discovery" && discoveryPhase === 4
+            cabaretStep === "discovery" &&
+            (discoveryPhase === 4 || discoveryPhase === 5)
               ? styles.fadeOut
               : ""
           }`}

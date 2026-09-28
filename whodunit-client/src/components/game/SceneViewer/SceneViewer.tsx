@@ -17,6 +17,7 @@ export default function SceneViewer() {
     useGameStore();
   const { addLines, clear, activeLine, playerName } = useTextStore();
   const [gameStarted, setGameStarted] = useState(false);
+  const { cabaretStep } = useUIStore();
 
   // Load starting scene after player clicks to begin
   useEffect(() => {
@@ -35,7 +36,7 @@ export default function SceneViewer() {
     if (!gameStarted || !currentScene) return;
     if (currentScene.name === "Detective's Office") return;
     if (currentScene.name === "The Blue Moon Cabaret") return;
-    if (currentScene.name === "Dressing Room") return; 
+    if (currentScene.name === "Dressing Room") return;
 
     clear();
     addLines([{ text: currentScene.description || "", speaker: "narrator" }]);
@@ -96,8 +97,14 @@ export default function SceneViewer() {
               }
             }}
           >
+            {/* background image */}
             <img
-              src={currentScene.image_url}
+              src={
+                isCabaret &&
+                ["blackout", "discovery", "done"].includes(cabaretStep)
+                  ? "/assets/images/scenes/bar-without-tom.png"
+                  : currentScene.image_url
+              }
               alt={currentScene.name}
               className={styles.image}
             />
