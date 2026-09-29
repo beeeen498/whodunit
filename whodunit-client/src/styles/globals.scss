@@ -144,7 +144,7 @@ ol {
 .character {
   position: absolute;
   bottom: 0;
-  height: 90%;
+  height: 60%;
   z-index: 3;
   transition:
     filter 0.4s ease,
@@ -155,8 +155,7 @@ ol {
   }
 
   &.dimmed {
-    filter: brightness(0.5);
-    opacity: 0.7;
+    opacity: 0.6;
   }
 
   &.hoverGlow {
@@ -189,4 +188,9 @@ ol {
 
 .clickable {
   cursor: pointer;
+}
+
+// Hide the overlay
+.hidden {
+  opacity: 0;
 }

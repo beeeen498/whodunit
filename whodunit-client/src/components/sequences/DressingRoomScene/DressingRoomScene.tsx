@@ -9,37 +9,14 @@ import styles from "./DressingRoomScene.module.scss";
 export default function DressingRoomScene() {
   const { addLines, clear, activeLine, playerName } = useTextStore();
   const [hoveredSuspect, setHoveredSuspect] = useState<string | null>(null);
+  const [bodyHovered, setBodyHovered] = useState(false);
   const [agnesAway, setAgnesAway] = useState(false);
+  const [activeSuspectConversation, setActiveSuspectConversation] = useState<
+    string | null
+  >(null);
+  const [talkedTo, setTalkedTo] = useState<Set<string>>(new Set());
   const { dressingStep, setDressingStep, focusCharacter, focusedCharacter } =
     useUIStore();
-
-  const suspectStatements: Record<
-    string,
-    { text: string; color: string; name: string }
-  > = {
-    walter: {
-      name: CHARACTERS.walter.name,
-      text: "I was with you in the main hall when the power went out, and then I heard Tom yelling.",
-      color: CHARACTERS.walter.color,
-    },
-    agnes: {
-      name: CHARACTERS.agnes.name,
-      text: "I was outside. I heard yelling and came back in.",
-      color: CHARACTERS.agnes.color,
-    },
-  };
-
-  const handleTalk = (id: string) => {
-    const statement = suspectStatements[id];
-    if (!statement) return;
-    addLines([
-      {
-        text: statement.text,
-        speaker: statement.name,
-        color: statement.color,
-      },
-    ]);
-  };
 
   // ========================
   // Auto-focus: highlight whoever is speaking
@@ -53,6 +30,17 @@ export default function DressingRoomScene() {
     else if (speaker.includes("tom")) focusCharacter("tom");
     else focusCharacter(null); // detective or narrator lines — nobody highlighted
   }, [activeLine]);
+
+  // ========================
+  // Helper: decide a character's highlight state
+  // ========================
+  const getCharacterState = (id: string) => {
+    if (focusedCharacter === id) return "speaking";
+    if (focusedCharacter || activeLine?.speaker === CHARACTERS.narrator.name) {
+      return "dimmed";
+    }
+    return "";
+  };
 
   // ========================
   // Step: NARRATION
@@ -103,6 +91,11 @@ export default function DressingRoomScene() {
         text: "Tom, call the police. Now.",
         speaker: `Detective ${playerName}`,
         color: CHARACTERS.detective.color,
+      },
+      {
+        text: "Of course.",
+        speaker: CHARACTERS.tom.name,
+        color: CHARACTERS.tom.color,
       },
       {
         text: "I'll do it.",
@@ -159,7 +152,7 @@ export default function DressingRoomScene() {
             color: CHARACTERS.detective.color,
           }
         : {
-            text: "A woman is lying dead on the floor, and you're worried about your business?! Call them. Now.",
+            text: "A woman is lying dead on the floor, and you're worried about your business?! She already went to call them - don't you dare stop her.",
             speaker: `Detective ${playerName}`,
             color: CHARACTERS.detective.color,
           },
@@ -176,7 +169,7 @@ export default function DressingRoomScene() {
 
     addLines([
       {
-        text: "I can't get through. The shortage must've knocked out the fuse in your office too — the phone's dead.",
+        text: "I couldn't make a call. The shortage must've knocked out the fuse in your office too — the phone's dead.",
         speaker: CHARACTERS.agnes.name,
         color: CHARACTERS.agnes.color,
       },
@@ -204,7 +197,7 @@ export default function DressingRoomScene() {
   // ========================
   useEffect(() => {
     if (dressingStep !== "lie") return;
-    if (activeLine?.text?.includes("I can't get through")) {
+    if (activeLine?.text?.includes("I couldn't make a call")) {
       setAgnesAway(false);
     }
   }, [activeLine, dressingStep]);
@@ -264,12 +257,115 @@ export default function DressingRoomScene() {
   }, [activeLine, dressingStep]);
 
   // ========================
+  // Step: Suspects statements
+  // ========================
+  const suspectStatements: Record<
+    string,
+    {
+      question: string;
+      text: string;
+      color: string;
+      name: string;
+      thought: string;
+    }
+  > = {
+    walter: {
+      question: "Walter, tell me exactly what you saw.",
+      name: CHARACTERS.walter.name,
+      text: "I was with you in the main hall when the power went out, and then I heard Tom yelling.",
+      color: CHARACTERS.walter.color,
+      thought:
+        "He was with you the whole time. But he doesn't want police anywhere near this place. Is that just business, or is he hiding something?",
+    },
+    agnes: {
+      question: "Agnes, what were you doing during all this?",
+      name: CHARACTERS.agnes.name,
+      text: "I was outside. I heard yelling and came back in.",
+      color: CHARACTERS.agnes.color,
+      thought: "If neither of the men did it... could it have been her?",
+    },
+    tom: {
+      question: "Tom, walk me through what happened.",
+      name: CHARACTERS.tom.name,
+      text: "I have no idea what happened. I went to fix the fuse - it's right outside this room. When the lights came back, she was already like that.",
+      color: CHARACTERS.tom.color,
+      thought:
+        "He was right outside, alone, in the dark, fixing that fuse. If he'd slipped in and out, no one would have seen a thing. But if he did it... why scream and drag everyone's attention straight to himself?",
+    },
+  };
+
+  const handleTalk = (id: string) => {
+    if (activeSuspectConversation) return;
+
+    const statement = suspectStatements[id];
+    if (!statement) return;
+
+    setActiveSuspectConversation(id);
+    focusCharacter(id);
+
+    addLines([
+      {
+        text: statement.question,
+        speaker: `Detective ${playerName}`,
+        color: CHARACTERS.detective.color,
+      },
+      {
+        text: statement.text,
+        speaker: statement.name,
+        color: statement.color,
+      },
+      {
+        text: statement.thought,
+        speaker: CHARACTERS.narrator.name,
+      },
+    ]);
+  };
+
+  // ========================
+  // A suspect conversation ends once their "thought" line
+  // is the one that just finished — unlock talking to others
+  // ========================
+  useEffect(() => {
+    if (!activeSuspectConversation) return;
+    const { history } = useTextStore.getState();
+
+    const statement = suspectStatements[activeSuspectConversation];
+    if (!statement) return;
+
+    if (history.some((l) => l.text?.includes(statement.thought))) {
+      const finished = activeSuspectConversation;
+      setActiveSuspectConversation(null);
+      focusCharacter(null);
+
+      setTalkedTo((prev) => new Set(prev).add(finished));
+
+      // Point 5: once all three have been talked to, add a wrap-up line
+      if (talkedTo.size + 1 === 3) {
+        addLines([
+          {
+            text: "Ok, I talked to all of them. I don't think I'll get more information right now. Maybe checking the victim will shed more light on what happened.",
+            speaker: `Detective ${playerName}`,
+            color: CHARACTERS.detective.color,
+          },
+        ]);
+      }
+    }
+  }, [activeLine, activeSuspectConversation]);
+
+  // ========================
   // Render
   // ========================
   return (
     <>
       {/* Dark overlay behind characters, same pattern as CabaretArrival */}
-      <div className={`overlay ${focusedCharacter ? "focused" : ""}`} />
+      <div
+        className={`overlay ${
+          activeLine?.speaker === CHARACTERS.narrator.name ||
+          (dressingStep === "talk" && !activeSuspectConversation)
+            ? "hidden"
+            : ""
+        }`}
+      />
 
       {/* ---- PORTRAIT SPRITES ---- */}
       {/* All three visible, none focused, during "order" —
@@ -277,46 +373,39 @@ export default function DressingRoomScene() {
       {["narration", "order", "choice", "lie"].includes(dressingStep) && (
         <>
           <img
-            src={CHARACTERS.walter.portrait}
+            src={CHARACTERS.walter.fullBody}
             alt={CHARACTERS.walter.name}
-            className={`character ${styles.characterLeft} ${
-              focusedCharacter === "walter"
-                ? "speaking"
-                : focusedCharacter
-                  ? "dimmed"
-                  : ""
-            }`}
+            className={`character ${styles.raised} ${styles.characterLeft} ${getCharacterState("walter")}`}
           />
 
           <img
-            src={CHARACTERS.agnes.portrait}
+            src={CHARACTERS.agnes.fullBody}
             alt={CHARACTERS.agnes.name}
-            className={`character ${styles.characterCenter} ${
-              agnesAway
-                ? "fadeOut"
-                : `fadeIn ${
-                    focusedCharacter === "agnes"
-                      ? "speaking"
-                      : focusedCharacter
-                        ? "dimmed"
-                        : ""
-                  }`
+            className={`character ${styles.raised} ${styles.characterCenter} ${
+              agnesAway ? "fadeOut" : `fadeIn ${getCharacterState("agnes")}`
             }`}
           />
 
           <img
-            src={CHARACTERS.tom.portrait}
+            src={CHARACTERS.tom.fullBody}
             alt={CHARACTERS.tom.name}
-            className={`character ${styles.characterRight} ${
-              focusedCharacter === "tom"
-                ? "speaking"
-                : focusedCharacter
-                  ? "dimmed"
-                  : ""
-            }`}
+            className={`character ${styles.raised} ${styles.characterRight} ${getCharacterState("tom")}`}
           />
         </>
       )}
+
+      {/* ---- CORPSE SPRITE ---- */}
+      <img
+        src="/assets/images/characters/singer-body-full.png"
+        alt="Clara's body"
+        className={`character ${styles.corpse} ${
+          dressingStep === "talk"
+            ? `clickable ${bodyHovered ? "hoverGlow" : ""}`
+            : ""
+        }`}
+        onMouseEnter={() => dressingStep === "talk" && setBodyHovered(true)}
+        onMouseLeave={() => setBodyHovered(false)}
+      />
 
       {/* ---- FULL BODY SPRITES (talk step, clickable) ---- */}
       {dressingStep === "talk" && (
@@ -324,22 +413,52 @@ export default function DressingRoomScene() {
           <img
             src={CHARACTERS.walter.fullBody}
             alt={CHARACTERS.walter.name}
-            className={`character ${styles.characterLeft} clickable ${
-              hoveredSuspect === "walter" ? "hoverGlow" : ""
+            className={`character ${styles.raised} ${styles.characterLeft} ${
+              activeSuspectConversation
+                ? activeSuspectConversation === "walter"
+                  ? "speaking"
+                  : "dimmed"
+                : `clickable ${styles.raised} ${hoveredSuspect === "walter" ? "hoverGlow" : ""}`
             }`}
-            onMouseEnter={() => setHoveredSuspect("walter")}
+            onMouseEnter={() =>
+              !activeSuspectConversation && setHoveredSuspect("walter")
+            }
             onMouseLeave={() => setHoveredSuspect(null)}
             onClick={() => handleTalk("walter")}
           />
+
           <img
             src={CHARACTERS.agnes.fullBody}
             alt={CHARACTERS.agnes.name}
-            className={`character ${styles.characterCenter} clickable ${
-              hoveredSuspect === "agnes" ? "hoverGlow" : ""
+            className={`character ${styles.raised} ${styles.characterCenter} ${
+              activeSuspectConversation
+                ? activeSuspectConversation === "agnes"
+                  ? "speaking"
+                  : "dimmed"
+                : `clickable ${hoveredSuspect === "agnes" ? "hoverGlow" : ""}`
             }`}
-            onMouseEnter={() => setHoveredSuspect("agnes")}
+            onMouseEnter={() =>
+              !activeSuspectConversation && setHoveredSuspect("agnes")
+            }
             onMouseLeave={() => setHoveredSuspect(null)}
             onClick={() => handleTalk("agnes")}
+          />
+
+          <img
+            src={CHARACTERS.tom.fullBody}
+            alt={CHARACTERS.tom.name}
+            className={`character ${styles.raised} ${styles.characterRight} ${
+              activeSuspectConversation
+                ? activeSuspectConversation === "tom"
+                  ? "speaking"
+                  : "dimmed"
+                : `clickable ${styles.raised} ${hoveredSuspect === "tom" ? "hoverGlow" : ""}`
+            }`}
+            onMouseEnter={() =>
+              !activeSuspectConversation && setHoveredSuspect("tom")
+            }
+            onMouseLeave={() => setHoveredSuspect(null)}
+            onClick={() => handleTalk("tom")}
           />
         </>
       )}

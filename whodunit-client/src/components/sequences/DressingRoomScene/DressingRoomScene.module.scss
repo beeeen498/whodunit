@@ -1,5 +1,5 @@
 .characterLeft {
-  left: 5%;
+  left: 30%;
 }
 
 .characterCenter {
@@ -8,6 +8,18 @@
 }
 
 .characterRight {
-  right: 5%;
+  right: 30%;
 }
 
+.raised {
+  bottom: 11%;
+}
+
+.corpse {
+  position: absolute;
+  bottom: 3%;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 22%;
+  z-index: 4;
+}

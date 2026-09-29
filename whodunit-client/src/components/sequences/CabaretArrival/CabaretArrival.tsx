@@ -399,14 +399,14 @@ export default function CabaretArrival({ exits }: CabaretArrivalProps) {
           <img
             src={CHARACTERS.walter.fullBody}
             alt={CHARACTERS.walter.name}
-            className={styles.fullBody}
+            className="character dimmed"
             style={{ left: "30.5%" }}
           />
 
           <img
             src={CHARACTERS.agnes.fullBody}
             alt={CHARACTERS.agnes.name}
-            className={styles.fullBody}
+            className="character dimmed"
             style={{ left: "45.5%" }}
           />
         </>
