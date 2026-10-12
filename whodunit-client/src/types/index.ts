@@ -55,6 +55,15 @@ export interface Clue {
   suspect_id: string | null;
   required_clue_id: string | null;
   type: string; // 'physical' | 'dialogue' | 'document' | 'observation'
+
+  // ========================
+  // Body panel: where the clue sits on the inspection image (percent)
+  // and what kind of popup it opens. Empty for clues with no hotspot.
+  // ========================
+  x: number | null;
+  y: number | null;
+  inspect_type: string | null; // 'image' | 'model' | ...
+  inspect_url: string | null;
 }
 
 export interface Suspect {
