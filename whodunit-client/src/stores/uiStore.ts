@@ -74,6 +74,10 @@ interface UIStore {
   // Dressing room discovery sequence
   dressingStep: DressingStep;
   setDressingStep: (step: DressingStep) => void;
+
+  // Body panel (dressing room investigation)
+  bodyPanelOpen: boolean;
+  setBodyPanelOpen: (open: boolean) => void;
 }
 
 // ========================
@@ -88,6 +92,7 @@ export const useUIStore = create<UIStore>((set, get) => ({
   transitionType: "fade",
   notification: null,
   focusedCharacter: null,
+  bodyPanelOpen: false,
 
   // Sequence steps
   officeStep: "narration",
@@ -121,4 +126,6 @@ export const useUIStore = create<UIStore>((set, get) => ({
   setCabaretStep: (step) => set({ cabaretStep: step }),
 
   setDressingStep: (step) => set({ dressingStep: step }),
+
+  setBodyPanelOpen: (open) => set({ bodyPanelOpen: open }),
 }));

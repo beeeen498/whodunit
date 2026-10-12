@@ -1,0 +1,38 @@
+.panel {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  background: var(--black);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  // The wrapper shrinks to the size of the image
+  .imageWrapper {
+    position: relative;
+    display: inline-block;
+    height: 100%;
+
+    .image {
+      display: block;
+      height: 100%;
+      width: auto;
+      max-width: none;
+    }
+  }
+
+  .closeBtn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    z-index: 11;
+    padding: 0.5rem 1rem;
+    color: var(--text-primary);
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid var(--grey);
+
+    &:hover {
+      border-color: var(--light-grey);
+    }
+  }
+}

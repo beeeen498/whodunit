@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useTextStore } from "@/stores/textStore";
 import { useUIStore } from "@/stores/uiStore";
 import { CHARACTERS } from "@/constants/characters";
+import BodyPanel from "@/components/game/BodyPanel/BodyPanel";
 import styles from "./DressingRoomScene.module.scss";
 
 export default function DressingRoomScene() {
@@ -15,8 +16,14 @@ export default function DressingRoomScene() {
     string | null
   >(null);
   const [talkedTo, setTalkedTo] = useState<Set<string>>(new Set());
-  const { dressingStep, setDressingStep, focusCharacter, focusedCharacter } =
-    useUIStore();
+  const {
+    dressingStep,
+    setDressingStep,
+    focusCharacter,
+    focusedCharacter,
+    bodyPanelOpen,
+    setBodyPanelOpen,
+  } = useUIStore();
 
   // ========================
   // Auto-focus: highlight whoever is speaking
@@ -405,6 +412,7 @@ export default function DressingRoomScene() {
         }`}
         onMouseEnter={() => dressingStep === "talk" && setBodyHovered(true)}
         onMouseLeave={() => setBodyHovered(false)}
+        onClick={() => dressingStep === "talk" && setBodyPanelOpen(true)}
       />
 
       {/* ---- FULL BODY SPRITES (talk step, clickable) ---- */}
@@ -463,7 +471,8 @@ export default function DressingRoomScene() {
         </>
       )}
 
-      {/* ---- Body hotspot goes here (next session) ---- */}
+      {/* ---- BODY PANEL (full-screen investigation) ---- */}
+      {bodyPanelOpen && <BodyPanel />}
     </>
   );
 }
