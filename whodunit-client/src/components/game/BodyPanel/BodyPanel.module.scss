@@ -7,17 +7,21 @@
   align-items: center;
   justify-content: center;
 
-  // The wrapper shrinks to the size of the image
+  // Lets the wrapper below use cqw / cqh,
+  // which mean "1% of this panel's width / height"
+  container-type: size;
+
+  // The wrapper is as big as it can be without leaving the panel,
+  // and keeps the image's shape (--ratio is set in the component)
   .imageWrapper {
     position: relative;
-    display: inline-block;
-    height: 100%;
+    aspect-ratio: var(--ratio);
+    width: min(100cqw, calc(100cqh * var(--ratio)));
 
     .image {
       display: block;
+      width: 100%;
       height: 100%;
-      width: auto;
-      max-width: none;
     }
   }
 

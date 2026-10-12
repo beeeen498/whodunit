@@ -10,8 +10,13 @@ export default function DevTools() {
 
   const { currentScene, scenes, loadScene, visitScene } = useGameStore();
   const { clear } = useTextStore();
-  const { setOfficeStep, setCabaretStep, setDressingStep, focusCharacter } =
-    useUIStore();
+  const {
+    setOfficeStep,
+    setCabaretStep,
+    setDressingStep,
+    focusCharacter,
+    setBodyPanelOpen,
+  } = useUIStore();
 
   // ========================
   // Scene jumping
@@ -270,6 +275,13 @@ export default function DevTools() {
             }}
           >
             → Done
+          </button>
+
+          <button
+            className={styles.btn}
+            onClick={() => setBodyPanelOpen(false)}
+          >
+            Close Panel
           </button>
         </>
       )}
