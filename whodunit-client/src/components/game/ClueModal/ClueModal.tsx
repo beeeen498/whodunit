@@ -1,0 +1,69 @@
+"use client";
+
+import type { CSSProperties } from "react";
+import { FaXmark } from "react-icons/fa6";
+import type { Clue } from "@/types";
+import styles from "./ClueModal.module.scss";
+
+interface ClueModalProps {
+  clue: Clue;
+  imageUrl: string;
+  ratio: number; // width / height of the body image
+  onClose: () => void;
+}
+
+// How much the crop is zoomed in
+const ZOOM = 3;
+
+const clamp = (n: number) => Math.min(1, Math.max(0, n));
+
+// Turns a clue's x or y (in percent) into a background-position
+// that puts that spot in the middle of the photo.
+// Clues near an edge stop at the edge.
+const focusPercent = (value: number | null) =>
+  value == null ? 50 : clamp(((value / 100) * ZOOM - 0.5) / (ZOOM - 1)) * 100;
+
+export default function ClueModal({
+  clue,
+  imageUrl,
+  ratio,
+  onClose,
+}: ClueModalProps) {
+  const hasSpot = clue.x != null && clue.y != null;
+
+  // A clue with its own image uses it. Otherwise we crop the body image.
+  const photoStyle: CSSProperties = clue.inspect_url
+    ? {
+        backgroundImage: `url(${clue.inspect_url})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }
+    : {
+        backgroundImage: `url(${imageUrl})`,
+        backgroundSize: `${hasSpot ? ZOOM * 100 : 100}%`,
+        backgroundPosition: `${focusPercent(clue.x)}% ${focusPercent(clue.y)}%`,
+      };
+
+  return (
+    <div className={styles.backdrop}>
+      <div className={styles.polaroid}>
+        <button
+          className={styles.closeBtn}
+          onClick={onClose}
+          aria-label="Close"
+        >
+          <FaXmark />
+        </button>
+
+        <h3 className={styles.title}>{clue.name}</h3>
+
+        <div
+          className={styles.photo}
+          style={{ ...photoStyle, aspectRatio: ratio }}
+        />
+
+        <p className={styles.description}>{clue.description}</p>
+      </div>
+    </div>
+  );
+}

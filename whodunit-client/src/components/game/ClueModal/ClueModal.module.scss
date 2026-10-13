@@ -1,0 +1,59 @@
+// Dark layer behind the polaroid
+.backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 13;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.75);
+
+  // The polaroid card
+  .polaroid {
+    position: relative;
+    width: min(80%, 460px);
+    max-height: 92%;
+    overflow-y: auto;
+    padding: 1rem 1rem 1.5rem;
+    background: #e9e4d8;
+    color: #1a1a1a;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+    transform: rotate(-1.5deg);
+
+    .closeBtn {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      display: flex;
+      padding: 0.25rem;
+      font-size: 1.2rem;
+      color: #1a1a1a;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+
+      &:hover {
+        color: #7a1f1f;
+      }
+    }
+
+    .title {
+      margin: 0 2rem 0.75rem 0;
+      font-size: 1.1rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .photo {
+      width: 100%;
+      background-color: #111;
+      background-repeat: no-repeat;
+    }
+
+    .description {
+      margin: 0.9rem 0 0;
+      font-size: 1rem;
+      line-height: 1.4;
+    }
+  }
+}

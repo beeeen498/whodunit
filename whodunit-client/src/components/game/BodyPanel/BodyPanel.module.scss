@@ -7,6 +7,14 @@
   align-items: center;
   justify-content: center;
 
+  // Hide the normal cursor everywhere inside the panel.
+  // The magnifying glass replaces it.
+  cursor: none;
+
+  * {
+    cursor: none;
+  }
+
   // Lets the wrapper below use cqw / cqh,
   // which mean "1% of this panel's width / height"
   container-type: size;
@@ -23,6 +31,16 @@
       width: 100%;
       height: 100%;
     }
+
+    // An invisible round hotspot, centered on the clue's x and y.
+    // 5% wide, so Four Fingers and the Pale Band don't overlap.
+    .hotspot {
+      position: absolute;
+      width: 5%;
+      aspect-ratio: 1;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+    }
   }
 
   .closeBtn {
@@ -37,6 +55,31 @@
 
     &:hover {
       border-color: var(--light-grey);
+    }
+  }
+
+  // The magnifying glass that follows the mouse
+  .cursor {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 12;
+    font-size: 40px;
+    line-height: 0;
+    color: var(--off-white);
+    pointer-events: none;
+    opacity: 0;
+    transition:
+      color 0.15s ease,
+      opacity 0.15s ease;
+
+    &.visible {
+      opacity: 1;
+    }
+
+    // Over a clue hotspot
+    &.active {
+      color: var(--red-bright);
     }
   }
 }

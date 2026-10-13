@@ -4,11 +4,13 @@ import { useEffect, useState } from "react";
 import { useTextStore } from "@/stores/textStore";
 import { useUIStore } from "@/stores/uiStore";
 import { CHARACTERS } from "@/constants/characters";
+import { useGameStore } from "@/stores/gameStore";
 import BodyPanel from "@/components/game/BodyPanel/BodyPanel";
 import styles from "./DressingRoomScene.module.scss";
 
 export default function DressingRoomScene() {
   const { addLines, clear, activeLine, playerName } = useTextStore();
+  const { currentClues, gameState, discoverClue } = useGameStore();
   const [hoveredSuspect, setHoveredSuspect] = useState<string | null>(null);
   const [bodyHovered, setBodyHovered] = useState(false);
   const [agnesAway, setAgnesAway] = useState(false);
@@ -412,7 +414,28 @@ export default function DressingRoomScene() {
         }`}
         onMouseEnter={() => dressingStep === "talk" && setBodyHovered(true)}
         onMouseLeave={() => setBodyHovered(false)}
-        onClick={() => dressingStep === "talk" && setBodyPanelOpen(true)}
+        onClick={() => {
+          // Only during the talk step, and not in the middle of
+          // a conversation with a suspect
+          if (dressingStep !== "talk" || activeSuspectConversation) return;
+
+          setBodyPanelOpen(true);
+
+          // Reset the text area, then the narrator starts on its own
+          clear();
+          addLines([
+            {
+              text: "On the cold, hard floor of the dressing room lies Clara, face down. One bullet wound at the back of her head. It's clear to you that she was shot from the back. She probably never saw her killer.",
+              speaker: CHARACTERS.narrator.name,
+            },
+          ]);
+
+          // Add "Body Position" to the clues, but only the first time
+          const bodyClue = currentClues.find((c) => c.name === "Body Position");
+          if (bodyClue && !gameState?.clues_found.includes(bodyClue.id)) {
+            discoverClue(bodyClue.id);
+          }
+        }}
       />
 
       {/* ---- FULL BODY SPRITES (talk step, clickable) ---- */}
