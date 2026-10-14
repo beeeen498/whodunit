@@ -4,13 +4,11 @@ import { useEffect, useState } from "react";
 import { useTextStore } from "@/stores/textStore";
 import { useUIStore } from "@/stores/uiStore";
 import { CHARACTERS } from "@/constants/characters";
-import { useGameStore } from "@/stores/gameStore";
 import BodyPanel from "@/components/game/BodyPanel/BodyPanel";
 import styles from "./DressingRoomScene.module.scss";
 
 export default function DressingRoomScene() {
   const { addLines, clear, activeLine, playerName } = useTextStore();
-  const { currentClues, gameState, discoverClue } = useGameStore();
   const [hoveredSuspect, setHoveredSuspect] = useState<string | null>(null);
   const [bodyHovered, setBodyHovered] = useState(false);
   const [agnesAway, setAgnesAway] = useState(false);
@@ -429,12 +427,6 @@ export default function DressingRoomScene() {
               speaker: CHARACTERS.narrator.name,
             },
           ]);
-
-          // Add "Body Position" to the clues, but only the first time
-          const bodyClue = currentClues.find((c) => c.name === "Body Position");
-          if (bodyClue && !gameState?.clues_found.includes(bodyClue.id)) {
-            discoverClue(bodyClue.id);
-          }
         }}
       />
 

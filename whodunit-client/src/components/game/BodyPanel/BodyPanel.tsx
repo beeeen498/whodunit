@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { CSSProperties, MouseEvent, SyntheticEvent } from "react";
 import { FaMagnifyingGlass } from "react-icons/fa6";
 import type { Clue } from "@/types";
@@ -13,10 +13,16 @@ import styles from "./BodyPanel.module.scss";
 
 const BODY_IMAGE = "/assets/images/scenes/singer-body.png";
 
+// Pause (in ms) between the narrator finishing and the body polaroid
+const POPUP_DELAY = 600;
+
+// Pause (in ms) between closing a polaroid and the detective speaking
+const SPEAK_DELAY = 400;
+
 export default function BodyPanel() {
   const { setBodyPanelOpen } = useUIStore();
   const { currentClues, gameState, discoverClue } = useGameStore();
-  const { addLines, playerName } = useTextStore();
+  const { addLines, playerName, activeLine } = useTextStore();
 
   // ========================
   // Refs and state for the magnifying glass cursor
@@ -26,8 +32,17 @@ export default function BodyPanel() {
   const [cursorVisible, setCursorVisible] = useState(false);
   const [hoveredClueId, setHoveredClueId] = useState<string | null>(null);
 
-  // The clue whose polaroid is open (null = no popup)
+  // ========================
+  // Clue popup state
+  // pendingBodyClue = the Body Position clue, waiting for the
+  //                   narrator to finish before it shows
+  // selectedClue    = the polaroid on the screen right now
+  // clueToSpeak     = a newly found clue whose detective line
+  //                   plays when the polaroid is closed
+  // ========================
+  const [pendingBodyClue, setPendingBodyClue] = useState<Clue | null>(null);
   const [selectedClue, setSelectedClue] = useState<Clue | null>(null);
+  const clueToSpeak = useRef<Clue | null>(null);
 
   // ========================
   // Image shape (width / height)
@@ -52,11 +67,50 @@ export default function BodyPanel() {
     panelClues.length > 0 && panelClues.every((c) => foundIds.includes(c.id));
 
   // ========================
-  // Clicking a clue: open the polaroid, add the clue to the
-  // found list, and the detective says his line.
-  // The line and the "found" step only happen the first time.
+  // When the panel opens, the Body Position clue is added to the
+  // clues and waits for the narrator to finish (first time only)
+  // ========================
+  useEffect(() => {
+    const bodyClue = currentClues.find((c) => c.name === "Body Position");
+    if (!bodyClue) return;
+
+    const alreadyFound = useGameStore
+      .getState()
+      .gameState?.clues_found.includes(bodyClue.id);
+    if (alreadyFound) return;
+
+    discoverClue(bodyClue.id);
+    setPendingBodyClue(bodyClue);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // ========================
+  // Show the Body Position polaroid only when nobody is
+  // talking anymore. This runs every time the text changes.
+  // ========================
+  useEffect(() => {
+    if (!pendingBodyClue) return;
+    if (activeLine) return; // still talking
+    if (useTextStore.getState().queue.length > 0) return; // more lines coming
+
+    const timer = setTimeout(() => {
+      setCursorVisible(false);
+      setSelectedClue(pendingBodyClue);
+      setPendingBodyClue(null);
+    }, POPUP_DELAY);
+
+    return () => clearTimeout(timer);
+  }, [pendingBodyClue, activeLine]);
+
+  // ========================
+  // Clicking a clue: the polaroid appears.
+  // If the clue is new, it is added to the found list and
+  // saved in clueToSpeak. The detective talks when it closes.
   // ========================
   const handleClueClick = (clue: Clue) => {
+    // Ignore clicks while the body polaroid is waiting or a polaroid is open
+    if (pendingBodyClue || selectedClue) return;
+
     setHoveredClueId(null);
     setCursorVisible(false);
     setSelectedClue(clue);
@@ -64,16 +118,34 @@ export default function BodyPanel() {
     if (foundIds.includes(clue.id)) return;
 
     discoverClue(clue.id);
+    clueToSpeak.current = clue;
+  };
 
-    if (clue.detail_text) {
+  // ========================
+  // Closing the polaroid (X button): after a short pause the
+  // detective says his line about the clue, if it's a new one.
+  // ========================
+  const handleModalClose = () => {
+    setSelectedClue(null);
+
+    const clue = clueToSpeak.current;
+    clueToSpeak.current = null;
+    if (!clue?.detail_text) return;
+
+    setTimeout(() => {
+      // If an older line is still waiting for Continue,
+      // move it to the history first, so the new line starts right away
+      const { activeLine: current, queue, advance } = useTextStore.getState();
+      if (current && queue.length === 0) advance();
+
       addLines([
         {
-          text: clue.detail_text,
+          text: clue.detail_text!,
           speaker: `Detective ${playerName}`,
           color: CHARACTERS.detective.color,
         },
       ]);
-    }
+    }, SPEAK_DELAY);
   };
 
   // ========================
@@ -169,7 +241,7 @@ export default function BodyPanel() {
           clue={selectedClue}
           imageUrl={BODY_IMAGE}
           ratio={ratio}
-          onClose={() => setSelectedClue(null)}
+          onClose={handleModalClose}
         />
       )}
     </>

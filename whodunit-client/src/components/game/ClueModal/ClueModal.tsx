@@ -3,6 +3,7 @@
 import type { CSSProperties } from "react";
 import { FaXmark } from "react-icons/fa6";
 import type { Clue } from "@/types";
+import ModelViewer from "./ModelViewer";
 import styles from "./ClueModal.module.scss";
 
 interface ClueModalProps {
@@ -31,18 +32,34 @@ export default function ClueModal({
 }: ClueModalProps) {
   const hasSpot = clue.x != null && clue.y != null;
 
-  // A clue with its own image uses it. Otherwise we crop the body image.
-  const photoStyle: CSSProperties = clue.inspect_url
-    ? {
-        backgroundImage: `url(${clue.inspect_url})`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-      }
-    : {
-        backgroundImage: `url(${imageUrl})`,
-        backgroundSize: `${hasSpot ? ZOOM * 100 : 100}%`,
-        backgroundPosition: `${focusPercent(clue.x)}% ${focusPercent(clue.y)}%`,
-      };
+  // ========================
+  // What does this clue show?
+  // model -> 3D model the player can spin
+  // image -> the clue's own picture
+  // neither -> a zoomed crop of the body image
+  // ========================
+  const isModel = clue.inspect_type === "model" && !!clue.inspect_url;
+  const isImage = !isModel && !!clue.inspect_url;
+
+  let photoStyle: CSSProperties;
+
+  if (isModel) {
+    photoStyle = { aspectRatio: "4 / 3" };
+  } else if (isImage) {
+    photoStyle = {
+      aspectRatio: "4 / 3",
+      backgroundImage: `url(${clue.inspect_url})`,
+      backgroundSize: "cover",
+      backgroundPosition: "center",
+    };
+  } else {
+    photoStyle = {
+      aspectRatio: ratio,
+      backgroundImage: `url(${imageUrl})`,
+      backgroundSize: `${hasSpot ? ZOOM * 100 : 100}%`,
+      backgroundPosition: `${focusPercent(clue.x)}% ${focusPercent(clue.y)}%`,
+    };
+  }
 
   return (
     <div className={styles.backdrop}>
@@ -57,10 +74,11 @@ export default function ClueModal({
 
         <h3 className={styles.title}>{clue.name}</h3>
 
-        <div
-          className={styles.photo}
-          style={{ ...photoStyle, aspectRatio: ratio }}
-        />
+        <div className={styles.photo} style={photoStyle}>
+          {isModel && <ModelViewer src={clue.inspect_url!} alt={clue.name} />}
+        </div>
+
+        {isModel && <p className={styles.hint}>Drag to rotate</p>}
 
         <p className={styles.description}>{clue.description}</p>
       </div>

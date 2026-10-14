@@ -42,6 +42,7 @@ interface GameStore {
   initGame: (caseId: string) => Promise<void>;
   loadScene: (sceneId: string) => Promise<void>;
   discoverClue: (clueId: string) => Promise<void>;
+  resetClues: () => void;
   visitScene: (sceneId: string) => Promise<void>;
   makeConnection: (connectionId: string) => Promise<void>;
   startDialogue: (suspect: Suspect) => Promise<void>;
@@ -149,12 +150,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const { gameState } = get();
     if (!gameState) return;
 
+    if (gameState.clues_found.includes(clueId)) return;
+
     set({
       gameState: {
         ...gameState,
         clues_found: [...gameState.clues_found, clueId],
       },
     });
+  },
+
+  // Dev: forget all found clues
+  resetClues: () => {
+    const { gameState } = get();
+    if (!gameState) return;
+    set({ gameState: { ...gameState, clues_found: [] } });
   },
 
   // Mark a scene as visited

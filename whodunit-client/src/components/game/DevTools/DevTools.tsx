@@ -8,7 +8,8 @@ import styles from "./DevTools.module.scss";
 export default function DevTools() {
   if (process.env.NODE_ENV !== "development") return null;
 
-  const { currentScene, scenes, loadScene, visitScene } = useGameStore();
+  const { currentScene, scenes, loadScene, visitScene, resetClues } =
+    useGameStore();
   const { clear } = useTextStore();
   const {
     setOfficeStep,
@@ -64,6 +65,7 @@ export default function DevTools() {
   // ========================
 
   const handleResetDressing = () => {
+    resetClues();
     setDressingStep("narration");
     const dressingRoom = scenes.find((s) => s.name === "Dressing Room");
     if (dressingRoom) {

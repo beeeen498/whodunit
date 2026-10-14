@@ -42,18 +42,38 @@
       font-size: 1.1rem;
       letter-spacing: 0.05em;
       text-transform: uppercase;
+      color: #111;
     }
 
+    // The photo area: holds the picture, the crop, or the 3D model
     .photo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
       width: 100%;
       background-color: #111;
       background-repeat: no-repeat;
+
+      .loading {
+        margin: 0;
+        font-size: 0.9rem;
+        color: #bbb;
+      }
+    }
+
+    // Small text under a 3D model
+    .hint {
+      margin: 0.5rem 0 0;
+      font-size: 0.8rem;
+      text-align: center;
+      color: #555;
     }
 
     .description {
       margin: 0.9rem 0 0;
       font-size: 1rem;
       line-height: 1.4;
+      color: #555;
     }
   }
 }
