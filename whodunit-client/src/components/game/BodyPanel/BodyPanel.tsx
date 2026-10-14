@@ -19,7 +19,11 @@ const POPUP_DELAY = 600;
 // Pause (in ms) between closing a polaroid and the detective speaking
 const SPEAK_DELAY = 400;
 
-export default function BodyPanel() {
+interface BodyPanelProps {
+  suspectsTalkedTo: boolean; // did the player already talk to all three?
+}
+
+export default function BodyPanel({ suspectsTalkedTo }: BodyPanelProps) {
   const { setBodyPanelOpen } = useUIStore();
   const { currentClues, gameState, discoverClue } = useGameStore();
   const { addLines, playerName, activeLine } = useTextStore();
@@ -43,6 +47,9 @@ export default function BodyPanel() {
   const [pendingBodyClue, setPendingBodyClue] = useState<Clue | null>(null);
   const [selectedClue, setSelectedClue] = useState<Clue | null>(null);
   const clueToSpeak = useRef<Clue | null>(null);
+
+  // True when the clue just found is the last one on the image
+  const completesAllClues = useRef(false);
 
   // ========================
   // Image shape (width / height)
@@ -119,6 +126,12 @@ export default function BodyPanel() {
 
     discoverClue(clue.id);
     clueToSpeak.current = clue;
+
+    // Will every clue on the image be found once this one is added?
+    const foundAfter = [...foundIds, clue.id];
+    completesAllClues.current = panelClues.every((c) =>
+      foundAfter.includes(c.id),
+    );
   };
 
   // ========================
@@ -129,22 +142,42 @@ export default function BodyPanel() {
     setSelectedClue(null);
 
     const clue = clueToSpeak.current;
+    const completed = completesAllClues.current;
     clueToSpeak.current = null;
-    if (!clue?.detail_text) return;
+    completesAllClues.current = false;
+    if (!clue) return; // clue was already found, nothing to say
+
+    // The detective's line about the clue, then (if it was the
+    // last one) the line that says there's nothing more to find
+    const lines: { text: string; speaker: string; color?: string }[] = [];
+
+    if (clue.detail_text) {
+      lines.push({
+        text: clue.detail_text,
+        speaker: `Detective ${playerName}`,
+        color: CHARACTERS.detective.color,
+      });
+    }
+
+    if (completed) {
+      lines.push({
+        text: suspectsTalkedTo
+          ? "I've seen everything I need to. Let's move on."
+          : "Found all of the clues. Now to talk with the suspects.",
+        speaker: `Detective ${playerName}`,
+        color: CHARACTERS.detective.color,
+      });
+    }
+
+    if (lines.length === 0) return;
 
     setTimeout(() => {
       // If an older line is still waiting for Continue,
-      // move it to the history first, so the new line starts right away
+      // move it to the history first, so the new lines start right away
       const { activeLine: current, queue, advance } = useTextStore.getState();
       if (current && queue.length === 0) advance();
 
-      addLines([
-        {
-          text: clue.detail_text!,
-          speaker: `Detective ${playerName}`,
-          color: CHARACTERS.detective.color,
-        },
-      ]);
+      addLines(lines);
     }, SPEAK_DELAY);
   };
 

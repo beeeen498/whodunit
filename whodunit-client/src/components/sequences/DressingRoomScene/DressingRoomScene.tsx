@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useTextStore } from "@/stores/textStore";
 import { useUIStore } from "@/stores/uiStore";
 import { CHARACTERS } from "@/constants/characters";
+import { useGameStore } from "@/stores/gameStore";
 import BodyPanel from "@/components/game/BodyPanel/BodyPanel";
 import styles from "./DressingRoomScene.module.scss";
 
@@ -57,6 +58,8 @@ export default function DressingRoomScene() {
     if (dressingStep !== "narration") return;
 
     clear();
+
+    setTalkedTo(new Set());
 
     addLines([
       {
@@ -329,34 +332,49 @@ export default function DressingRoomScene() {
   };
 
   // ========================
-  // A suspect conversation ends once their "thought" line
-  // is the one that just finished — unlock talking to others
+  // A suspect conversation ends when their "thought" line is
+  // the last line that finished. Then we unlock the other
+  // suspects and remember who we talked to. When it's the third
+  // suspect, the detective says a wrap-up line.
   // ========================
   useEffect(() => {
     if (!activeSuspectConversation) return;
-    const { history } = useTextStore.getState();
+
+    const { activeLine: current, queue, history } = useTextStore.getState();
+    if (current || queue.length > 0) return; // still talking
 
     const statement = suspectStatements[activeSuspectConversation];
     if (!statement) return;
 
-    if (history.some((l) => l.text?.includes(statement.thought))) {
-      const finished = activeSuspectConversation;
-      setActiveSuspectConversation(null);
-      focusCharacter(null);
+    const lastLine = history[history.length - 1];
+    if (!lastLine?.text?.includes(statement.thought)) return;
 
-      setTalkedTo((prev) => new Set(prev).add(finished));
+    const finished = activeSuspectConversation;
+    setActiveSuspectConversation(null);
+    focusCharacter(null);
 
-      // Point 5: once all three have been talked to, add a wrap-up line
-      if (talkedTo.size + 1 === 3) {
-        addLines([
-          {
-            text: "Ok, I talked to all of them. I don't think I'll get more information right now. Maybe checking the victim will shed more light on what happened.",
-            speaker: `Detective ${playerName}`,
-            color: CHARACTERS.detective.color,
-          },
-        ]);
-      }
-    }
+    const updated = new Set(talkedTo).add(finished);
+    setTalkedTo(updated);
+
+    // Only the first time we talk to this suspect, and only on the third
+    if (talkedTo.has(finished) || updated.size !== 3) return;
+
+    // Did the player already find every clue on the body?
+    const { currentClues, gameState } = useGameStore.getState();
+    const panelClues = currentClues.filter((c) => c.x != null && c.y != null);
+    const cluesDone =
+      panelClues.length > 0 &&
+      panelClues.every((c) => gameState?.clues_found.includes(c.id));
+
+    addLines([
+      {
+        text: cluesDone
+          ? "I've seen everything I need to. Let's move on."
+          : "Ok, I talked to all of them. I don't think I'll get more information right now. Maybe checking the victim will shed more light on what happened.",
+        speaker: `Detective ${playerName}`,
+        color: CHARACTERS.detective.color,
+      },
+    ]);
   }, [activeLine, activeSuspectConversation]);
 
   // ========================
@@ -487,7 +505,7 @@ export default function DressingRoomScene() {
       )}
 
       {/* ---- BODY PANEL (full-screen investigation) ---- */}
-      {bodyPanelOpen && <BodyPanel />}
+      {bodyPanelOpen && <BodyPanel suspectsTalkedTo={talkedTo.size === 3} />}
     </>
   );
 }
