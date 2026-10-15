@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import type { CSSProperties } from "react";
 import { FaXmark } from "react-icons/fa6";
 import type { Clue } from "@/types";
@@ -31,6 +32,9 @@ export default function ClueModal({
   onClose,
 }: ClueModalProps) {
   const hasSpot = clue.x != null && clue.y != null;
+
+  // Becomes true when the player touches the 3D model
+  const [touched, setTouched] = useState(false);
 
   // ========================
   // What does this clue show?
@@ -74,12 +78,16 @@ export default function ClueModal({
 
         <h3 className={styles.title}>{clue.name}</h3>
 
-        <div className={styles.photo} style={photoStyle}>
+        <div
+          className={styles.photo}
+          style={photoStyle}
+          onPointerDownCapture={() => setTouched(true)}
+        >
           {isModel && <ModelViewer src={clue.inspect_url!} alt={clue.name} />}
         </div>
 
-        {isModel && <p className={styles.hint}>Drag to rotate</p>}
-
+        {isModel && !touched && <p className={styles.hint}>Drag to rotate</p>}
+        
         <p className={styles.description}>{clue.description}</p>
       </div>
     </div>
