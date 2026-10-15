@@ -31,6 +31,8 @@ type DressingStep =
   | "lie" // Agnes's fuse lie, "no one leaves"
   | "talk" // suspect statements + Harold enters
   | "investigating" // body hotspot active, clue search open
+  | "harold" // Harold barges in, forced conversation
+  | "wrapup" // detective sends Agnes for help, exit opens
   | "done"; // all 7 clues found, exit unlocked
 
 interface UIStore {

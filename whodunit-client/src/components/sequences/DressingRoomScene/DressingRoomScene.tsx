@@ -17,6 +17,10 @@ export default function DressingRoomScene() {
     string | null
   >(null);
   const [talkedTo, setTalkedTo] = useState<Set<string>>(new Set());
+
+  // True once Harold has walked in (he fades in when this turns true)
+  const [haroldHere, setHaroldHere] = useState(false);
+
   const {
     dressingStep,
     setDressingStep,
@@ -36,6 +40,7 @@ export default function DressingRoomScene() {
     if (speaker.includes("walter")) focusCharacter("walter");
     else if (speaker.includes("agnes")) focusCharacter("agnes");
     else if (speaker.includes("tom")) focusCharacter("tom");
+    else if (speaker.includes("harold")) focusCharacter("harold");
     else focusCharacter(null); // detective or narrator lines — nobody highlighted
   }, [activeLine]);
 
@@ -60,6 +65,7 @@ export default function DressingRoomScene() {
     clear();
 
     setTalkedTo(new Set());
+    setHaroldHere(false);
 
     addLines([
       {
@@ -233,6 +239,72 @@ export default function DressingRoomScene() {
   }, [dressingStep, playerName]);
 
   // ========================
+  // Trigger: Harold comes in when everything is done.
+  // The player checked the body, talked to all three suspects,
+  // closed the panel, and the detective finished his last line.
+  // ========================
+  useEffect(() => {
+    if (dressingStep !== "talk") return;
+    if (bodyPanelOpen) return;
+    if (talkedTo.size < 3) return;
+    if (activeSuspectConversation) return;
+    if (activeLine) return;
+    if (useTextStore.getState().queue.length > 0) return;
+
+    const { currentClues, gameState } = useGameStore.getState();
+    const panelClues = currentClues.filter((c) => c.x != null && c.y != null);
+    const cluesDone =
+      panelClues.length > 0 &&
+      panelClues.every((c) => gameState?.clues_found.includes(c.id));
+    if (!cluesDone) return;
+
+    // A short pause, so Harold doesn't come in on top of the last line
+    const timer = setTimeout(() => setDressingStep("harold"), 1000);
+    return () => clearTimeout(timer);
+  }, [
+    dressingStep,
+    bodyPanelOpen,
+    talkedTo,
+    activeSuspectConversation,
+    activeLine,
+  ]);
+
+  // ========================
+  // Step: HAROLD (part A: he barges in)
+  // ========================
+  useEffect(() => {
+    if (dressingStep !== "harold") return;
+
+    clear();
+    setHaroldHere(true);
+
+    addLines([
+      {
+        text: "The door swings open. A man stands in the doorway, out of breath, searching the room.",
+        speaker: CHARACTERS.narrator.name,
+      },
+      {
+        text: "Agnes? Agnes, are you in here? Has anyone seen my wife?",
+        speaker: CHARACTERS.harold.name,
+        color: CHARACTERS.harold.color,
+      },
+      {
+        text: "Agnes rushes to him and throws her arms around him.",
+        speaker: CHARACTERS.narrator.name,
+      },
+      {
+        text: "Harold? You can't be in here!",
+        speaker: CHARACTERS.walter.name,
+        color: CHARACTERS.walter.color,
+      },
+      {
+        text: `He thinks: "I've never seen this man before. Everyone else here seems to know him."`,
+        speaker: CHARACTERS.narrator.name,
+      },
+    ]);
+  }, [dressingStep]);
+
+  // ========================
   // Auto-advance: watches for text completion
   // and moves to the next step
   // ========================
@@ -395,7 +467,9 @@ export default function DressingRoomScene() {
       {/* ---- PORTRAIT SPRITES ---- */}
       {/* All three visible, none focused, during "order" —
           reads as the detective addressing the whole room */}
-      {["narration", "order", "choice", "lie"].includes(dressingStep) && (
+      {["narration", "order", "choice", "lie", "harold"].includes(
+        dressingStep,
+      ) && (
         <>
           <img
             src={CHARACTERS.walter.fullBody}
@@ -417,6 +491,17 @@ export default function DressingRoomScene() {
             className={`character ${styles.raised} ${styles.characterRight} ${getCharacterState("tom")}`}
           />
         </>
+      )}
+
+      {/* ---- HAROLD (fades in when he walks in) ---- */}
+      {dressingStep === "harold" && (
+        <img
+          src={CHARACTERS.harold.fullBody}
+          alt={CHARACTERS.harold.name}
+          className={`character ${styles.raised} ${styles.characterFar} ${
+            haroldHere ? `fadeIn ${getCharacterState("harold")}` : "fadeOut"
+          }`}
+        />
       )}
 
       {/* ---- CORPSE SPRITE ---- */}

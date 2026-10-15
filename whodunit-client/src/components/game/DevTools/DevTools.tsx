@@ -268,6 +268,28 @@ export default function DevTools() {
           >
             → Investigating
           </button>
+
+          <button
+            className={styles.btn}
+            onClick={() => {
+              clear();
+              setDressingStep("harold");
+              focusCharacter(null);
+            }}
+          >
+            → Harold
+          </button>
+          <button
+            className={styles.btn}
+            onClick={() => {
+              clear();
+              setDressingStep("wrapup");
+              focusCharacter(null);
+            }}
+          >
+            → Wrap-up
+          </button>
+
           <button
             className={styles.btn}
             onClick={() => {
