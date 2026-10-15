@@ -34,7 +34,7 @@ const CLUE_REACTIONS: Record<
     {
       speaker: CHARACTERS.walter.name,
       color: CHARACTERS.walter.color,
-      text: "It's the key to the club! I've been looking for it! What is it doing here?",
+      text: "It's the spare key to the club! I've been looking for it! What is it doing here?",
     },
     {
       speaker: CHARACTERS.tom.name,

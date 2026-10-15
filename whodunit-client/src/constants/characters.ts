@@ -38,8 +38,8 @@ export const CHARACTERS = {
   harold: {
     name: "Harold",
     color: "#b5734f", // rust/brown — butcher, earthy
-    portrait: "/assets/images/characters/harold-portrait.png",
-    fullBody: "/assets/images/characters/harold-full-body.png",
+    portrait: "/assets/images/characters/husband-portrait.png",
+    fullBody: "/assets/images/characters/husband-full-body.png",
   },
   clara: {
     name: "Clara",

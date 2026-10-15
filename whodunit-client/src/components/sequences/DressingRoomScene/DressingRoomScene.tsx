@@ -13,6 +13,7 @@ export default function DressingRoomScene() {
   const [hoveredSuspect, setHoveredSuspect] = useState<string | null>(null);
   const [bodyHovered, setBodyHovered] = useState(false);
   const [agnesAway, setAgnesAway] = useState(false);
+  const [walterAway, setWalterAway] = useState(false);
   const [activeSuspectConversation, setActiveSuspectConversation] = useState<
     string | null
   >(null);
@@ -65,6 +66,7 @@ export default function DressingRoomScene() {
     clear();
 
     setTalkedTo(new Set());
+    setWalterAway(false);
     setHaroldHere(false);
 
     addLines([
@@ -200,6 +202,16 @@ export default function DressingRoomScene() {
         color: CHARACTERS.detective.color,
       },
       {
+        text: "Walter, lock all the doors. No one comes in, no one goes out.",
+        speaker: `Detective ${playerName}`,
+        color: CHARACTERS.detective.color,
+      },
+      {
+        text: "...Right away.",
+        speaker: CHARACTERS.walter.name,
+        color: CHARACTERS.walter.color,
+      },
+      {
         text: "As of now, everyone in this building is a suspect in a murder.",
         speaker: `Detective ${playerName}`,
         color: CHARACTERS.detective.color,
@@ -237,6 +249,33 @@ export default function DressingRoomScene() {
       },
     ]);
   }, [dressingStep, playerName]);
+
+  // ========================
+  // Walter leaves (to lock the doors) right after he says
+  // "...Right away." He stays away until the talk step starts.
+  // ========================
+  useEffect(() => {
+    if (dressingStep !== "lie") return;
+
+    const { history } = useTextStore.getState();
+    if (history.some((l) => l.text?.includes("Right away"))) {
+      setWalterAway(true);
+    }
+  }, [activeLine, dressingStep]);
+
+  // ========================
+  // Walter comes back once the detective's first talk line
+  // ("Until the police get here...") is finished
+  // ========================
+  useEffect(() => {
+    if (dressingStep !== "talk") return;
+    if (activeLine) return; // still talking
+
+    const { history } = useTextStore.getState();
+    if (history.some((l) => l.text?.includes("Until the police get here"))) {
+      setWalterAway(false);
+    }
+  }, [activeLine, dressingStep]);
 
   // ========================
   // Trigger: Harold comes in when everything is done.
@@ -280,7 +319,7 @@ export default function DressingRoomScene() {
 
     addLines([
       {
-        text: "The door swings open. A man stands in the doorway, out of breath, searching the room.",
+        text: "The door swings open. A man stands in the doorway, searching the room.",
         speaker: CHARACTERS.narrator.name,
       },
       {
@@ -474,7 +513,9 @@ export default function DressingRoomScene() {
           <img
             src={CHARACTERS.walter.fullBody}
             alt={CHARACTERS.walter.name}
-            className={`character ${styles.raised} ${styles.characterLeft} ${getCharacterState("walter")}`}
+            className={`character ${styles.raised} ${styles.characterLeft} ${
+              walterAway ? "fadeOut" : `fadeIn ${getCharacterState("walter")}`
+            }`}
           />
 
           <img
@@ -540,11 +581,15 @@ export default function DressingRoomScene() {
             src={CHARACTERS.walter.fullBody}
             alt={CHARACTERS.walter.name}
             className={`character ${styles.raised} ${styles.characterLeft} ${
-              activeSuspectConversation
-                ? activeSuspectConversation === "walter"
-                  ? "speaking"
-                  : "dimmed"
-                : `clickable ${styles.raised} ${hoveredSuspect === "walter" ? "hoverGlow" : ""}`
+              walterAway
+                ? "fadeOut"
+                : `fadeIn ${
+                    activeSuspectConversation
+                      ? activeSuspectConversation === "walter"
+                        ? "speaking"
+                        : "dimmed"
+                      : `clickable ${hoveredSuspect === "walter" ? "hoverGlow" : ""}`
+                  }`
             }`}
             onMouseEnter={() =>
               !activeSuspectConversation && setHoveredSuspect("walter")
