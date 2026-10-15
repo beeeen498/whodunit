@@ -19,6 +19,41 @@ const POPUP_DELAY = 600;
 // Pause (in ms) between closing a polaroid and the detective speaking
 const SPEAK_DELAY = 400;
 
+// ========================
+// What other characters say right after a clue's polaroid closes.
+// The key is the clue's name in the database.
+// ========================
+const CLUE_REACTIONS: Record<
+  string,
+  { speaker: string; text: string; color?: string }[]
+> = {
+  "Club Key": [
+    {
+      speaker: CHARACTERS.walter.name,
+      color: CHARACTERS.walter.color,
+      text: "It's the key to the club! I've been looking for it! What is it doing here?",
+    },
+    {
+      speaker: CHARACTERS.tom.name,
+      color: CHARACTERS.tom.color,
+      text: "I gave it to her.",
+    },
+    {
+      speaker: CHARACTERS.walter.name,
+      color: CHARACTERS.walter.color,
+      text: "You did what?! We'll talk about this later!",
+    },
+  ],
+};
+
+// ========================
+// Extra clues added once a clue's reactions have happened.
+// These clues have no spot on the image. They only go to the clues.
+// ========================
+const CLUE_UNLOCKS: Record<string, string[]> = {
+  "Club Key": ["Tom Gave Clara a Key", "The Owner Seems Upset"],
+};
+
 interface BodyPanelProps {
   suspectsTalkedTo: boolean; // did the player already talk to all three?
 }
@@ -147,8 +182,9 @@ export default function BodyPanel({ suspectsTalkedTo }: BodyPanelProps) {
     completesAllClues.current = false;
     if (!clue) return; // clue was already found, nothing to say
 
-    // The detective's line about the clue, then (if it was the
-    // last one) the line that says there's nothing more to find
+    // The lines to play, in order:
+    // the detective's line, the reactions of the others,
+    // and (if it was the last clue) the line that says there's nothing more
     const lines: { text: string; speaker: string; color?: string }[] = [];
 
     if (clue.detail_text) {
@@ -159,6 +195,8 @@ export default function BodyPanel({ suspectsTalkedTo }: BodyPanelProps) {
       });
     }
 
+    lines.push(...(CLUE_REACTIONS[clue.name] ?? []));
+
     if (completed) {
       lines.push({
         text: suspectsTalkedTo
@@ -168,6 +206,15 @@ export default function BodyPanel({ suspectsTalkedTo }: BodyPanelProps) {
         color: CHARACTERS.detective.color,
       });
     }
+
+    // Add the extra clues that come with this one
+    (CLUE_UNLOCKS[clue.name] ?? []).forEach((name) => {
+      const extra = currentClues.find((c) => c.name === name);
+      if (extra) {
+        discoverClue(extra.id);
+        console.log("Clue added:", name); // temporary, remove later
+      }
+    });
 
     if (lines.length === 0) return;
 
