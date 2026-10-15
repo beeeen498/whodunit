@@ -16,8 +16,11 @@ const BODY_IMAGE = "/assets/images/scenes/singer-body.png";
 // Pause (in ms) between the narrator finishing and the body polaroid
 const POPUP_DELAY = 600;
 
-// Pause (in ms) between closing a polaroid and the detective speaking
+// Pause (in ms) between closing a polaroid and the lines starting
 const SPEAK_DELAY = 400;
+
+// How long (in ms) the characters take to fade out when a reaction ends
+const FADE_OUT_TIME = 800;
 
 // ========================
 // What other characters say right after a clue's polaroid closes.
@@ -54,6 +57,15 @@ const CLUE_UNLOCKS: Record<string, string[]> = {
   "Club Key": ["Tom Gave Clara a Key", "The Owner Seems Upset"],
 };
 
+// ========================
+// The phases of a reaction (characters talking in the panel)
+// off     = nothing is happening
+// pending = polaroid just closed, scene is darkening, lines not started
+// on      = the characters are talking
+// leaving = the conversation ended, characters are fading out
+// ========================
+type ReactionPhase = "off" | "pending" | "on" | "leaving";
+
 interface BodyPanelProps {
   suspectsTalkedTo: boolean; // did the player already talk to all three?
 }
@@ -76,15 +88,23 @@ export default function BodyPanel({ suspectsTalkedTo }: BodyPanelProps) {
   // pendingBodyClue = the Body Position clue, waiting for the
   //                   narrator to finish before it shows
   // selectedClue    = the polaroid on the screen right now
-  // clueToSpeak     = a newly found clue whose detective line
-  //                   plays when the polaroid is closed
+  // clueToSpeak     = a newly found clue whose lines play
+  //                   when the polaroid is closed
+  // completesAllClues = true when that clue is the last one
   // ========================
   const [pendingBodyClue, setPendingBodyClue] = useState<Clue | null>(null);
   const [selectedClue, setSelectedClue] = useState<Clue | null>(null);
   const clueToSpeak = useRef<Clue | null>(null);
-
-  // True when the clue just found is the last one on the image
   const completesAllClues = useRef(false);
+
+  // ========================
+  // Reaction state: Walter and Tom talking in the panel
+  // cast = which of them are on the screen
+  // reactionHeard = true once one of them has spoken
+  // ========================
+  const [reaction, setReaction] = useState<ReactionPhase>("off");
+  const [cast, setCast] = useState({ walter: false, tom: false });
+  const reactionHeard = useRef(false);
 
   // ========================
   // Image shape (width / height)
@@ -107,6 +127,23 @@ export default function BodyPanel({ suspectsTalkedTo }: BodyPanelProps) {
 
   const allCluesFound =
     panelClues.length > 0 && panelClues.every((c) => foundIds.includes(c.id));
+
+  // ========================
+  // Who is speaking right now, and each character's look:
+  // the speaker is in focus, the other one is dimmed
+  // ========================
+  const speakingId =
+    activeLine?.speaker === CHARACTERS.walter.name
+      ? "walter"
+      : activeLine?.speaker === CHARACTERS.tom.name
+        ? "tom"
+        : null;
+
+  const getCharacterState = (id: string) => {
+    if (speakingId === id) return "speaking";
+    if (speakingId) return "dimmed";
+    return "";
+  };
 
   // ========================
   // When the panel opens, the Body Position clue is added to the
@@ -145,13 +182,50 @@ export default function BodyPanel({ suspectsTalkedTo }: BodyPanelProps) {
   }, [pendingBodyClue, activeLine]);
 
   // ========================
+  // Reaction: follows the text.
+  // Walter or Tom speaking -> that character fades in (and stays).
+  // Anyone else speaking, or no text at all, after one of them
+  // has spoken -> the conversation is over, everyone leaves.
+  // ========================
+  useEffect(() => {
+    if (reaction !== "on") return;
+
+    const speaker = activeLine?.speaker;
+
+    if (speaker === CHARACTERS.walter.name) {
+      reactionHeard.current = true;
+      setCast((c) => ({ ...c, walter: true }));
+    } else if (speaker === CHARACTERS.tom.name) {
+      reactionHeard.current = true;
+      setCast((c) => ({ ...c, tom: true }));
+    } else if (reactionHeard.current) {
+      setReaction("leaving");
+    }
+  }, [activeLine, reaction]);
+
+  // ========================
+  // Reaction: after the fade out, go back to normal
+  // ========================
+  useEffect(() => {
+    if (reaction !== "leaving") return;
+
+    const timer = setTimeout(() => {
+      setReaction("off");
+      setCast({ walter: false, tom: false });
+      reactionHeard.current = false;
+    }, FADE_OUT_TIME);
+
+    return () => clearTimeout(timer);
+  }, [reaction]);
+
+  // ========================
   // Clicking a clue: the polaroid appears.
   // If the clue is new, it is added to the found list and
-  // saved in clueToSpeak. The detective talks when it closes.
+  // saved in clueToSpeak. The lines play when the polaroid closes.
   // ========================
   const handleClueClick = (clue: Clue) => {
-    // Ignore clicks while the body polaroid is waiting or a polaroid is open
-    if (pendingBodyClue || selectedClue) return;
+    // Ignore clicks while something is waiting, open, or talking
+    if (pendingBodyClue || selectedClue || reaction !== "off") return;
 
     setHoveredClueId(null);
     setCursorVisible(false);
@@ -171,7 +245,10 @@ export default function BodyPanel({ suspectsTalkedTo }: BodyPanelProps) {
 
   // ========================
   // Closing the polaroid (X button): after a short pause the
-  // detective says his line about the clue, if it's a new one.
+  // lines play, if it's a new clue. In order:
+  // 1. the detective's line about the clue
+  // 2. the reactions of the other characters
+  // 3. if it was the last clue, the line that says there's nothing more
   // ========================
   const handleModalClose = () => {
     setSelectedClue(null);
@@ -182,9 +259,7 @@ export default function BodyPanel({ suspectsTalkedTo }: BodyPanelProps) {
     completesAllClues.current = false;
     if (!clue) return; // clue was already found, nothing to say
 
-    // The lines to play, in order:
-    // the detective's line, the reactions of the others,
-    // and (if it was the last clue) the line that says there's nothing more
+    const reactions = CLUE_REACTIONS[clue.name] ?? [];
     const lines: { text: string; speaker: string; color?: string }[] = [];
 
     if (clue.detail_text) {
@@ -195,7 +270,7 @@ export default function BodyPanel({ suspectsTalkedTo }: BodyPanelProps) {
       });
     }
 
-    lines.push(...(CLUE_REACTIONS[clue.name] ?? []));
+    lines.push(...reactions);
 
     if (completed) {
       lines.push({
@@ -210,11 +285,11 @@ export default function BodyPanel({ suspectsTalkedTo }: BodyPanelProps) {
     // Add the extra clues that come with this one
     (CLUE_UNLOCKS[clue.name] ?? []).forEach((name) => {
       const extra = currentClues.find((c) => c.name === name);
-      if (extra) {
-        discoverClue(extra.id);
-        console.log("Clue added:", name); // temporary, remove later
-      }
+      if (extra) discoverClue(extra.id);
     });
+
+    // The scene darkens right away, so it is dark when the characters show up
+    if (reactions.length > 0) setReaction("pending");
 
     if (lines.length === 0) return;
 
@@ -225,6 +300,9 @@ export default function BodyPanel({ suspectsTalkedTo }: BodyPanelProps) {
       if (current && queue.length === 0) advance();
 
       addLines(lines);
+
+      // Only now do we start following the text
+      if (reactions.length > 0) setReaction("on");
     }, SPEAK_DELAY);
   };
 
@@ -258,11 +336,13 @@ export default function BodyPanel({ suspectsTalkedTo }: BodyPanelProps) {
     console.log(`x: ${x}, y: ${y}`);
   };
 
+  const reacting = reaction !== "off";
+
   return (
     <>
       <div
         ref={panelRef}
-        className={styles.panel}
+        className={`${styles.panel} ${reacting ? styles.reacting : ""}`}
         onMouseMove={handlePanelMouseMove}
         onMouseLeave={() => setCursorVisible(false)}
       >
@@ -294,8 +374,39 @@ export default function BodyPanel({ suspectsTalkedTo }: BodyPanelProps) {
           ))}
         </div>
 
-        {/* Close button: only after every clue on this image is found */}
-        {allCluesFound && (
+        {/* ---- REACTION: dark overlay and the characters ---- */}
+        {reacting && (
+          <>
+            <div
+              className={`overlay ${reaction === "leaving" ? "hidden" : ""}`}
+            />
+
+            {/* Each one starts invisible and fades in when
+                their first line starts */}
+            <img
+              src={CHARACTERS.walter.portrait}
+              alt={CHARACTERS.walter.name}
+              className={`character ${styles.reactionLeft} ${
+                reaction === "on" && cast.walter
+                  ? `fadeIn ${getCharacterState("walter")}`
+                  : "fadeOut"
+              }`}
+            />
+            <img
+              src={CHARACTERS.tom.portrait}
+              alt={CHARACTERS.tom.name}
+              className={`character ${styles.reactionRight} ${
+                reaction === "on" && cast.tom
+                  ? `fadeIn ${getCharacterState("tom")}`
+                  : "fadeOut"
+              }`}
+            />
+          </>
+        )}
+
+        {/* Close button: only after every clue on this image is found,
+            and not while the characters are talking */}
+        {allCluesFound && !reacting && (
           <button
             className={styles.closeBtn}
             onClick={() => setBodyPanelOpen(false)}
@@ -307,9 +418,9 @@ export default function BodyPanel({ suspectsTalkedTo }: BodyPanelProps) {
         {/* ---- MAGNIFYING GLASS CURSOR ---- */}
         <div
           ref={cursorRef}
-          className={`${styles.cursor} ${cursorVisible ? styles.visible : ""} ${
-            hoveredClueId ? styles.active : ""
-          }`}
+          className={`${styles.cursor} ${
+            cursorVisible && !reacting ? styles.visible : ""
+          } ${hoveredClueId ? styles.active : ""}`}
         >
           <FaMagnifyingGlass />
         </div>

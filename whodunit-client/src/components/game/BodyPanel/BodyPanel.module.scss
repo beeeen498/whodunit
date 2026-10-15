@@ -15,6 +15,15 @@
     cursor: none;
   }
 
+  // While Walter and Tom talk, the normal cursor comes back
+  &.reacting {
+    cursor: default;
+
+    * {
+      cursor: default;
+    }
+  }
+
   // Lets the wrapper below use cqw / cqh,
   // which mean "1% of this panel's width / height"
   container-type: size;
@@ -41,6 +50,19 @@
       transform: translate(-50%, -50%);
       border-radius: 50%;
     }
+  }
+
+  // Where Walter and Tom stand during a reaction.
+  // left / right: smaller number = closer to the edge = more space between them
+  // bottom: smaller number = lower on the screen
+  .reactionLeft {
+    left: 22%;
+    bottom: 0;
+  }
+
+  .reactionRight {
+    right: 22%;
+    bottom: 0;
   }
 
   .closeBtn {
