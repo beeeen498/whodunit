@@ -27,7 +27,7 @@ export default function Hero() {
         {/* Call to action */}
         <div className={styles.actions}>
           <Link
-            href="/case/2779d84d-2119-4e22-9a64-cff05ac48f36"
+            href="/case/6bad80b4-4e57-47cb-b7f2-c9f2e4ea4107"
             className={styles.playButton}
           >
             Begin Investigation

@@ -1,12 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTextStore } from "@/stores/textStore";
 import { useUIStore } from "@/stores/uiStore";
 import { CHARACTERS } from "@/constants/characters";
 import { useGameStore } from "@/stores/gameStore";
 import BodyPanel from "@/components/game/BodyPanel/BodyPanel";
 import styles from "./DressingRoomScene.module.scss";
+
+// The three questions the player can ask Harold
+type HaroldQuestionId = "who" | "how" | "heard";
 
 export default function DressingRoomScene() {
   const { addLines, clear, activeLine, playerName } = useTextStore();
@@ -21,6 +24,10 @@ export default function DressingRoomScene() {
 
   // True once Harold has walked in (he fades in when this turns true)
   const [haroldHere, setHaroldHere] = useState(false);
+
+  // Which of Harold's questions the player already asked
+  // (a ref, so the buttons always see the latest list)
+  const haroldAsked = useRef<Set<HaroldQuestionId>>(new Set());
 
   const {
     dressingStep,
@@ -309,39 +316,42 @@ export default function DressingRoomScene() {
   ]);
 
   // ========================
-  // Step: HAROLD (part A: he barges in)
+  // Step: HAROLD
+  // We hear him first, off-screen. Then he comes in
+  // and the player questions him.
   // ========================
   useEffect(() => {
     if (dressingStep !== "harold") return;
 
     clear();
-    setHaroldHere(true);
+    setHaroldHere(false);
+    haroldAsked.current = new Set();
 
     addLines([
       {
-        text: "The door swings open. A man stands in the doorway, searching the room.",
-        speaker: CHARACTERS.narrator.name,
-      },
-      {
-        text: "Agnes? Agnes, are you in here? Has anyone seen my wife?",
+        text: "Agnes? Agnes, are you here? Where the hell did everyone go?!",
         speaker: CHARACTERS.harold.name,
         color: CHARACTERS.harold.color,
       },
       {
-        text: "Agnes rushes to him and throws her arms around him.",
-        speaker: CHARACTERS.narrator.name,
+        text: "Oh my God! What happened here?!",
+        speaker: CHARACTERS.harold.name,
+        color: CHARACTERS.harold.color,
       },
-      {
-        text: "Harold? You can't be in here!",
-        speaker: CHARACTERS.walter.name,
-        color: CHARACTERS.walter.color,
-      },
-      {
-        text: `He thinks: "I've never seen this man before. Everyone else here seems to know him."`,
-        speaker: CHARACTERS.narrator.name,
-      },
+      haroldMenu(["who", "how"]),
     ]);
   }, [dressingStep]);
+
+  // ========================
+  // Harold fades in when his second line starts
+  // ========================
+  useEffect(() => {
+    if (dressingStep !== "harold") return;
+
+    if (activeLine?.text?.includes("Oh my God! What happened here")) {
+      setHaroldHere(true);
+    }
+  }, [activeLine, dressingStep]);
 
   // ========================
   // Auto-advance: watches for text completion
@@ -440,6 +450,102 @@ export default function DressingRoomScene() {
         speaker: CHARACTERS.narrator.name,
       },
     ]);
+  };
+
+  // ========================
+  // Harold's questions
+  // label    = the button the player sees
+  // question = what the detective says out loud
+  // answer   = what Harold says back
+  // ========================
+  const haroldQuestions: Record<
+    HaroldQuestionId,
+    { label: string; question: string; answer: string }
+  > = {
+    who: {
+      label: "Ask who he is",
+      question: "Who are you?",
+      answer: "Harold. Agnes's husband. What happened here?",
+    },
+    how: {
+      label: "Ask how he got in",
+      question: "How did you get in?",
+      answer:
+        "I was in the bathroom when the lights went out. When I came out, nobody was here.",
+    },
+    heard: {
+      label: "Ask about the screams",
+      question:
+        "So you were here, but you heard nothing? Didn't hear the screams?",
+      answer:
+        "I lost part of my hearing in the war. And have you been in that bathroom? Rain pouring down, that damn jukebox blasting. The Germans could drop a bomb in the middle of the club and you wouldn't hear a thing.",
+    },
+  };
+
+  // A menu for the text panel: one button per question
+  const haroldMenu = (ids: HaroldQuestionId[]) => ({
+    text: "",
+    type: "choice" as const,
+    options: ids.map((id) => ({ label: haroldQuestions[id].label, value: id })),
+    onChoose: (value: string) => askHarold(value as HaroldQuestionId),
+  });
+
+  // The player picked a question: the detective asks, Harold answers,
+  // then either the next menu shows or the confrontation starts
+  const askHarold = (id: HaroldQuestionId) => {
+    const q = haroldQuestions[id];
+    haroldAsked.current.add(id);
+
+    const detective = `Detective ${playerName}`;
+
+    const lines = [
+      {
+        text: q.question,
+        speaker: detective,
+        color: CHARACTERS.detective.color,
+      },
+      {
+        text: q.answer,
+        speaker: CHARACTERS.harold.name,
+        color: CHARACTERS.harold.color,
+      },
+    ];
+
+    // After the last question: Harold gets angry, the detective answers
+    const confrontation = [
+      {
+        text: "A woman is murdered, and the one man who heard nothing is the one nobody saw.",
+        speaker: detective,
+        color: CHARACTERS.detective.color,
+      },
+      {
+        text: "What are you saying? That I did this? What proof do you have? You can't put me in that room!",
+        speaker: CHARACTERS.harold.name,
+        color: CHARACTERS.harold.color,
+      },
+      {
+        text: "I never said you were in that room. But you told me you were in the club when the lights went out. The doors were locked right after we found her. You couldn't have come in after that. You were already inside.",
+        speaker: detective,
+        color: CHARACTERS.detective.color,
+      },
+      {
+        text: `He thinks: "He was in the building the whole time, and no one saw him. Unlucky, or hiding something?"`,
+        speaker: CHARACTERS.narrator.name,
+      },
+    ];
+
+    if (id === "heard") {
+      addLines([...lines, ...confrontation]);
+      return;
+    }
+
+    // Round 1: show whichever of the two questions is still unasked.
+    // When both are done, round 2 starts.
+    const firstRound: HaroldQuestionId[] = ["who", "how"];
+    const left = firstRound.filter((x) => !haroldAsked.current.has(x));
+    const nextMenu: HaroldQuestionId[] = left.length > 0 ? left : ["heard"];
+
+    addLines([...lines, haroldMenu(nextMenu)]);
   };
 
   // ========================
