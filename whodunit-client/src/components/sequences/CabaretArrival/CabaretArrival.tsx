@@ -202,6 +202,7 @@ export default function CabaretArrival({ exits }: CabaretArrivalProps) {
     if (cabaretStep !== "discovery") return;
 
     setIsBlackout(false);
+    setAgnesLeaving(false);
     setDiscoveryPhase(0);
     focusCharacter(null);
     clear();
