@@ -659,7 +659,9 @@ export default function DressingRoomScene() {
         className={`character ${styles.corpse} ${
           dressingStep === "talk"
             ? `clickable ${bodyHovered ? "hoverGlow" : ""}`
-            : ""
+            : dressingStep === "harold"
+              ? getCharacterState("corpse")
+              : ""
         }`}
         onMouseEnter={() => dressingStep === "talk" && setBodyHovered(true)}
         onMouseLeave={() => setBodyHovered(false)}
