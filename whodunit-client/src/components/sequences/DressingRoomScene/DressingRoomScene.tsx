@@ -105,7 +105,10 @@ export default function DressingRoomScene({ exits }: DressingRoomSceneProps) {
 
     setTalkedTo(new Set());
     setWalterAway(false);
+    setAgnesAway(false);
     setHaroldHere(false);
+    setActiveSuspectConversation(null);
+    setBodyPanelOpen(false);
 
     addLines([
       {
