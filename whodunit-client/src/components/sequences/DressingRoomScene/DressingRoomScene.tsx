@@ -6,12 +6,25 @@ import { useUIStore } from "@/stores/uiStore";
 import { CHARACTERS } from "@/constants/characters";
 import { useGameStore } from "@/stores/gameStore";
 import BodyPanel from "@/components/game/BodyPanel/BodyPanel";
+import Hotspot from "@/components/game/Hotspot/Hotspot";
 import styles from "./DressingRoomScene.module.scss";
 
 // The three questions the player can ask Harold
 type HaroldQuestionId = "who" | "how" | "heard";
 
-export default function DressingRoomScene() {
+interface DressingRoomSceneProps {
+  exits: {
+    id: string;
+    scene_id_to: string;
+    label: string | null;
+    x: number;
+    y: number;
+    targetName: string;
+    targetLocked: boolean;
+  }[];
+}
+
+export default function DressingRoomScene({ exits }: DressingRoomSceneProps) {
   const { addLines, clear, activeLine, playerName } = useTextStore();
   const [hoveredSuspect, setHoveredSuspect] = useState<string | null>(null);
   const [bodyHovered, setBodyHovered] = useState(false);
@@ -44,6 +57,12 @@ export default function DressingRoomScene() {
   useEffect(() => {
     if (!activeLine?.speaker) return;
 
+    // A line can say who it is aimed at. That character takes the focus.
+    if (activeLine.focus) {
+      focusCharacter(activeLine.focus);
+      return;
+    }
+
     const speaker = activeLine.speaker.toLowerCase();
     if (speaker.includes("walter")) focusCharacter("walter");
     else if (speaker.includes("agnes")) focusCharacter("agnes");
@@ -56,6 +75,18 @@ export default function DressingRoomScene() {
   // Helper: decide a character's highlight state
   // ========================
   const getCharacterState = (id: string) => {
+    // During Harold's chat, Harold stays in focus the whole time and
+    // everyone else is dimmed. The only exception is when another
+    // character is the one speaking: then that character takes the focus.
+    if (dressingStep === "harold") {
+      const otherSpeaker =
+        focusedCharacter && focusedCharacter !== "harold"
+          ? focusedCharacter
+          : null;
+      const inFocus = otherSpeaker ?? "harold";
+      return inFocus === id ? "speaking" : "dimmed";
+    }
+
     if (focusedCharacter === id) return "speaking";
     if (focusedCharacter || activeLine?.speaker === CHARACTERS.narrator.name) {
       return "dimmed";
@@ -116,6 +147,7 @@ export default function DressingRoomScene() {
         text: "Tom, call the police. Now.",
         speaker: `Detective ${playerName}`,
         color: CHARACTERS.detective.color,
+        focus: "tom",
       },
       {
         text: "Of course.",
@@ -175,11 +207,13 @@ export default function DressingRoomScene() {
             text: "Walter, a woman is dead. We have to call them. There's no way around this.",
             speaker: `Detective ${playerName}`,
             color: CHARACTERS.detective.color,
+            focus: "walter",
           }
         : {
             text: "A woman is lying dead on the floor, and you're worried about your business?! She already went to call them - don't you dare stop her.",
             speaker: `Detective ${playerName}`,
             color: CHARACTERS.detective.color,
+            focus: "walter",
           },
     ]);
     setDressingStep("lie");
@@ -212,6 +246,7 @@ export default function DressingRoomScene() {
         text: "Walter, lock all the doors. No one comes in, no one goes out.",
         speaker: `Detective ${playerName}`,
         color: CHARACTERS.detective.color,
+        focus: "walter",
       },
       {
         text: "...Right away.",
@@ -354,6 +389,28 @@ export default function DressingRoomScene() {
   }, [activeLine, dressingStep]);
 
   // ========================
+  // Step: WRAP-UP
+  // Harold's chat is over. The detective sends for the police
+  // and Walter takes everyone to his office.
+  // ========================
+  useEffect(() => {
+    if (dressingStep !== "wrapup") return;
+
+    addLines([
+      {
+        text: "I'll ask someone on the street to call the police. Until they get here, we'll use your office, Walter. Everyone stays inside.",
+        speaker: `Detective ${playerName}`,
+        color: CHARACTERS.detective.color,
+      },
+      {
+        text: "...Fine. This way.",
+        speaker: CHARACTERS.walter.name,
+        color: CHARACTERS.walter.color,
+      },
+    ]);
+  }, [dressingStep]);
+
+  // ========================
   // Auto-advance: watches for text completion
   // and moves to the next step
   // ========================
@@ -382,6 +439,20 @@ export default function DressingRoomScene() {
       case "lie":
         if (history.some((l) => l.text?.includes("suspect in a murder"))) {
           setDressingStep("talk");
+        }
+        break;
+
+      // Harold's chat done (the narrator's thought) → wrap-up
+      case "harold":
+        if (history.some((l) => l.text?.includes("hiding something"))) {
+          setDressingStep("wrapup");
+        }
+        break;
+
+      // Wrap-up done → the exit opens
+      case "wrapup":
+        if (history.some((l) => l.text?.includes("This way"))) {
+          setDressingStep("done");
         }
         break;
     }
@@ -604,7 +675,8 @@ export default function DressingRoomScene() {
       <div
         className={`overlay ${
           activeLine?.speaker === CHARACTERS.narrator.name ||
-          (dressingStep === "talk" && !activeSuspectConversation)
+          (dressingStep === "talk" && !activeSuspectConversation) ||
+          dressingStep === "done"
             ? "hidden"
             : ""
         }`}
@@ -613,9 +685,15 @@ export default function DressingRoomScene() {
       {/* ---- PORTRAIT SPRITES ---- */}
       {/* All three visible, none focused, during "order" —
           reads as the detective addressing the whole room */}
-      {["narration", "order", "choice", "lie", "harold"].includes(
-        dressingStep,
-      ) && (
+      {[
+        "narration",
+        "order",
+        "choice",
+        "lie",
+        "harold",
+        "wrapup",
+        "done",
+      ].includes(dressingStep) && (
         <>
           <img
             src={CHARACTERS.walter.fullBody}
@@ -642,7 +720,7 @@ export default function DressingRoomScene() {
       )}
 
       {/* ---- HAROLD (fades in when he walks in) ---- */}
-      {dressingStep === "harold" && (
+      {["harold", "wrapup", "done"].includes(dressingStep) && (
         <img
           src={CHARACTERS.harold.fullBody}
           alt={CHARACTERS.harold.name}
@@ -742,6 +820,23 @@ export default function DressingRoomScene() {
           />
         </>
       )}
+
+      {/* ---- EXIT: to the owner's office, once everything is done ---- */}
+      {dressingStep === "done" &&
+        !activeLine &&
+        exits
+          .filter((exit) => exit.label === "Go to the owner's office")
+          .map((exit) => (
+            <Hotspot
+              key={exit.id}
+              connectionId={exit.id}
+              targetSceneId={exit.scene_id_to}
+              label={exit.label || exit.targetName}
+              x={exit.x}
+              y={exit.y}
+              locked={exit.targetLocked}
+            />
+          ))}
 
       {/* ---- BODY PANEL (full-screen investigation) ---- */}
       {bodyPanelOpen && <BodyPanel suspectsTalkedTo={talkedTo.size === 3} />}

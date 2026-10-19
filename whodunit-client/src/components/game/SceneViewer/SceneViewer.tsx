@@ -118,7 +118,7 @@ export default function SceneViewer() {
 
             {isCabaret && <CabaretArrival exits={exits} />}
 
-            {isDressingRoom && <DressingRoomScene />}
+            {isDressingRoom && <DressingRoomScene exits={exits} />}
 
             {/* Default exits for scenes without a sequence */}
             {!isOffice &&

@@ -11,6 +11,7 @@ interface TextLine {
   color?: string;
   options?: { label: string; value: string }[];
   onChoose?: (value: string) => void;
+  focus?: string; // who the line is aimed at ("tom", "walter"...). That character takes the focus.
 }
 
 interface TextStore {
