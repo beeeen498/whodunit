@@ -37,6 +37,28 @@ export default function ClueModal({
   const [touched, setTouched] = useState(false);
 
   // ========================
+  // A letter: handwritten paper, no photo.
+  // The words come from the clue's description.
+  // ========================
+  if (clue.inspect_type === "letter") {
+    return (
+      <div className={styles.backdrop}>
+        <div className={styles.letter}>
+          <button
+            className={styles.closeBtn}
+            onClick={onClose}
+            aria-label="Close"
+          >
+            <FaXmark />
+          </button>
+
+          <p className={styles.letterText}>{clue.description}</p>
+        </div>
+      </div>
+    );
+  }
+
+  // ========================
   // What does this clue show?
   // model -> 3D model the player can spin
   // image -> the clue's own picture
@@ -87,7 +109,7 @@ export default function ClueModal({
         </div>
 
         {isModel && !touched && <p className={styles.hint}>Drag to rotate</p>}
-        
+
         <p className={styles.description}>{clue.description}</p>
       </div>
     </div>
