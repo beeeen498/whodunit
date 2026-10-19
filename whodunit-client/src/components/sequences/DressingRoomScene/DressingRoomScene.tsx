@@ -469,7 +469,7 @@ export default function DressingRoomScene() {
     },
     how: {
       label: "Ask how he got in",
-      question: "How did you get in?",
+      question: "How did you get in? Walter locked the doors.",
       answer:
         "I was in the bathroom when the lights went out. When I came out, nobody was here.",
     },
@@ -529,7 +529,7 @@ export default function DressingRoomScene() {
         color: CHARACTERS.detective.color,
       },
       {
-        text: `He thinks: "He was in the building the whole time, and no one saw him. Unlucky, or hiding something?"`,
+        text: `He was in the building the whole time, and no one saw him. Unlucky, or hiding something?`,
         speaker: CHARACTERS.narrator.name,
       },
     ];
