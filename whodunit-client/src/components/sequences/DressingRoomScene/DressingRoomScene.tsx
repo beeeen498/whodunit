@@ -469,7 +469,7 @@ export default function DressingRoomScene() {
     },
     how: {
       label: "Ask how he got in",
-      question: "How did you get in? Walter locked the doors.",
+      question: "How did you get in?",
       answer:
         "I was in the bathroom when the lights went out. When I came out, nobody was here.",
     },
@@ -511,20 +511,21 @@ export default function DressingRoomScene() {
       },
     ];
 
-    // After the last question: Harold gets angry, the detective answers
+    // After the last question: the detective calls Harold's story convenient,
+    // Harold pushes back, and the detective tells him he's a suspect too
     const confrontation = [
       {
-        text: "A woman is murdered, and the one man who heard nothing is the one nobody saw.",
+        text: "Sounds a little convenient, don't you think?",
         speaker: detective,
         color: CHARACTERS.detective.color,
       },
       {
-        text: "What are you saying? That I did this? What proof do you have? You can't put me in that room!",
+        text: "Convenient? What exactly are you suggesting, detective?",
         speaker: CHARACTERS.harold.name,
         color: CHARACTERS.harold.color,
       },
       {
-        text: "I never said you were in that room. But you told me you were in the club when the lights went out. The doors were locked right after we found her. You couldn't have come in after that. You were already inside.",
+        text: "That you're a suspect too. You were already inside when the lights went out, and we locked the doors right after we found her. Nobody came in after that. You were here the whole time, alone, with no one to vouch for you.",
         speaker: detective,
         color: CHARACTERS.detective.color,
       },
