@@ -813,7 +813,7 @@ export default function DressingRoomScene({ exits }: DressingRoomSceneProps) {
                 ? activeSuspectConversation === "tom"
                   ? "speaking"
                   : "dimmed"
-                : `clickable ${styles.raised} ${hoveredSuspect === "tom" ? "hoverGlow" : ""}`
+                : `clickable ${hoveredSuspect === "tom" ? "hoverGlow" : ""}`
             }`}
             onMouseEnter={() =>
               !activeSuspectConversation && setHoveredSuspect("tom")
