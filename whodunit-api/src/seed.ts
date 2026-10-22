@@ -235,6 +235,68 @@ async function seed() {
   console.log(`Scene connections created: ${connections.length * 2}`);
 
   // ═══════════════════════════════════════════════════════════
+  // ONE-WAY DOORS
+  // These go in one direction only (no door back).
+  // x and y = where the door hotspot sits on the scene image (percent)
+  // ═══════════════════════════════════════════════════════════
+  const oneWayConnections = [
+    // ── Story path ──
+    {
+      from: 'detectives_office',
+      to: 'city_map',
+      label: 'Leave the office',
+      x: 48.7,
+      y: 28.8,
+    },
+    {
+      from: 'main_bar',
+      to: 'dressing_room',
+      label: 'Go to the dressing room',
+      x: 50,
+      y: 50,
+    },
+    {
+      from: 'dressing_room',
+      to: 'owners_office',
+      label: "Go to the owner's office",
+      x: 78.2,
+      y: 39.6,
+    },
+
+    // ── City map ──
+    {
+      from: 'city_map',
+      to: 'main_bar',
+      label: 'The Blue Moon Cabaret',
+      x: 50,
+      y: 50,
+    },
+    {
+      from: 'city_map',
+      to: 'singers_apartment',
+      label: "Singer's Apartment",
+      x: 50,
+      y: 50,
+    },
+    {
+      from: 'city_map',
+      to: 'butchers_home',
+      label: "Butcher's Home",
+      x: 50,
+      y: 50,
+    },
+  ];
+
+  for (const c of oneWayConnections) {
+    await db.query(
+      `INSERT INTO scene_connections (scene_id_from, scene_id_to, label, is_locked, x, y)
+       VALUES ($1, $2, $3, $4, $5, $6)`,
+      [scenes[c.from], scenes[c.to], c.label, false, c.x, c.y],
+    );
+  }
+  console.log(`One-way doors created: ${oneWayConnections.length}`);
+
+  // ═══════════════════════════════════════════════════════════
   // SUSPECTS
   // ═══════════════════════════════════════════════════════════
   const suspects: Record<string, string> = {};
