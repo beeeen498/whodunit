@@ -776,8 +776,9 @@ async function seed() {
 
   // Second pass: wire up required_clue_id dependencies
   const dependencies: Record<string, string> = {
-    missing_bracelet: 'staff_photo', // need to see staff photo first
-    butcher_coat: 'missing_bracelet', // need to notice bracelet is missing first
+    // The bracelet in Harold's coat only shows
+    // after the player saw it in the staff photo
+    butcher_coat: 'staff_photo',
     // no_leak requires a dialogue clue we'll add later
   };
 
