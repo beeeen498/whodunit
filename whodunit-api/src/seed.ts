@@ -406,65 +406,92 @@ async function seed() {
 
   const clueData: ClueSeed[] = [
     // ── Dressing room (crime scene) ──
+    // Clues with x and y have a hotspot on the body panel image.
     {
       key: 'body_position',
       name: 'Body Position',
-      description: 'Clara is face-down on the floor. Shot in the back.',
-      detail_text:
-        'She never saw it coming. Whoever did this was behind her — she was facing away, searching for something.',
+      description:
+        'Clara lies face down, her back to the door. She was shot from behind and probably never saw her killer.',
       scene: 'dressing_room',
       type: 'observation',
+      // no x/y: this clue opens when the body is clicked
     },
     {
       key: 'four_fingers',
       name: 'Four Fingers',
       description:
-        'The victim has only four fingers on her left hand. Born with it.',
+        'Her left hand has only four fingers. An old injury from when she was a kid.',
       detail_text:
-        "Four fingers. That explains the scratch marks — if we find them on anyone, they'll be distinctive.",
+        'She lost it when she was a kid. She never liked talking about it.',
       scene: 'dressing_room',
       type: 'physical',
+      x: 4.3,
+      y: 52.9,
     },
     {
-      key: 'entry_wound',
-      name: 'Entry Wound',
+      key: 'gunshot_wound',
+      name: 'Gunshot Wound',
       description:
-        'Clean, precise entry wound in the back. Fired from close range with a small-caliber weapon.',
-      detail_text:
-        'A .32, maybe. Quiet enough that nobody in the bar heard it. And precise — whoever pulled the trigger could see exactly what they were doing.',
+        "One entry wound at the back of her head. No powder burns, no scorching around it. This wasn't fired at point-blank range. The killer stood back and took aim.",
+      detail_text: 'She never turned around. Whoever did this took their time.',
       scene: 'dressing_room',
       type: 'physical',
+      x: 24.4,
+      y: 22.6,
     },
     {
-      key: 'murder_weapon',
-      name: 'Murder Weapon',
+      key: 'revolver',
+      name: 'Revolver',
       description:
-        'A .32 caliber snub-nose revolver on the floor near the body.',
+        '.32 snub-nose revolver on the floor, a few steps from her body.',
       detail_text:
-        "Small, compact, quiet. The kind of gun someone carries when they don't want people to know they're carrying.",
+        "It's exactly like mine. Same make, same model. It's not very loud, and with the rain, the distance from the bar and the jukebox, nobody would have heard the shot. I won't touch it. Nobody goes near this until the police get here.",
       scene: 'dressing_room',
       type: 'physical',
-    },
-    {
-      key: 'missing_bracelet',
-      name: 'Missing Bracelet',
-      description:
-        "A tan line on Clara's left wrist where a bracelet should be. She never took it off.",
-      detail_text:
-        'Tan line but no bracelet. She wore it every day — birthday gift from her mother. So where is it now?',
-      scene: 'dressing_room',
-      type: 'observation',
-      required_clue: 'staff_photo',
+      x: 54.4,
+      y: 18.9,
+      inspect_type: 'model',
+      inspect_url: '/assets/models/gun.glb',
     },
     {
       key: 'club_key',
       name: 'Club Key',
       description:
-        "A key found on the victim's body. The owner says he never gave her one.",
-      detail_text:
-        'She had a key to the club. The owner looks surprised — or is it angry?',
+        'A small brass key lying at her side. It looks like a spare key to the club.',
       scene: 'dressing_room',
       type: 'physical',
+      x: 41,
+      y: 71.8,
+      inspect_type: 'model',
+      inspect_url: '/assets/models/key.glb',
+    },
+    {
+      key: 'folded_note',
+      name: 'Folded Note',
+      description: 'Clara,\n\nwe need to talk about what happened.\n\nTom',
+      detail_text: 'From Tom. What did he need to talk to her about?',
+      scene: 'dressing_room',
+      type: 'document',
+      x: 65,
+      y: 37,
+      inspect_type: 'letter',
+    },
+
+    // ── Dressing room: added after the Club Key reactions ──
+    // No x/y: they go straight to the clues, not the body panel.
+    {
+      key: 'tom_gave_key',
+      name: 'Tom Gave Clara a Key',
+      description: 'Tom admitted he gave Clara a key to the club.',
+      scene: 'dressing_room',
+      type: 'observation',
+    },
+    {
+      key: 'owner_upset',
+      name: 'The Owner Seems Upset',
+      description: 'Walter was upset that Tom gave Clara a key to the club.',
+      scene: 'dressing_room',
+      type: 'observation',
     },
     // ── Owner's office ──
     {
@@ -498,16 +525,6 @@ async function seed() {
       type: 'document',
     },
     // ── Main bar ──
-    {
-      key: 'bartender_note',
-      name: "Bartender's Note",
-      description:
-        'A folded note found near the singer\'s spot at the bar: "We need to talk about what happened. Please."',
-      detail_text:
-        'A note to Clara. No name, but the handwriting is shaky. Desperate. "What happened" — what happened between them?',
-      scene: 'main_bar',
-      type: 'document',
-    },
     {
       key: 'butcher_coat',
       name: 'Bracelet in Coat',
