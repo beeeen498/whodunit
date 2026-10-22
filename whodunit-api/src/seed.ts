@@ -61,12 +61,13 @@ async function seed() {
     // ── Act 1: Inside the club ──
     {
       key: 'main_bar',
-      name: 'Main Bar',
+      name: 'The Blue Moon Cabaret',
       description:
         'The heart of the club. A long wooden bar, tables scattered across the floor, a small stage where the singer performed hours ago. The air is thick with cigarette smoke and rising heat.',
       type: 'internal',
       is_locked: false,
       total_clues: 3,
+      image_url: '/assets/images/scenes/bar.png',
     },
     {
       key: 'owners_office',
@@ -94,6 +95,7 @@ async function seed() {
       type: 'internal',
       is_locked: false,
       total_clues: 6,
+      image_url: '/assets/images/scenes/dressing-room.jpeg',
     },
     {
       key: 'bathrooms',
@@ -157,15 +159,24 @@ async function seed() {
       description:
         'Your office. A desk, a filing cabinet, a bottle of whiskey. The operator message that brought you to the club tonight is on the desk.',
       type: 'external',
-      is_locked: true,
+      is_locked: false, // the game starts here
       total_clues: 1,
+      image_url: '/assets/images/scenes/office-night.png',
+    },
+    {
+      key: 'city_map',
+      name: 'City Map',
+      description: "The rain hasn't let up. The city waits.",
+      type: 'map',
+      is_locked: false,
+      total_clues: 0,
     },
   ];
 
   for (const s of sceneData) {
     const [row] = await db.query(
-      `INSERT INTO scenes (case_id, name, description, type, is_locked, unlock_clue_id, total_clues)
-       VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
+      `INSERT INTO scenes (case_id, name, description, type, is_locked, unlock_clue_id, total_clues, image_url)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`,
       [
         caseId,
         s.name,
@@ -174,6 +185,7 @@ async function seed() {
         s.is_locked,
         s.unlock_clue_id ?? null,
         s.total_clues,
+        s.image_url ?? null, // background image, null if none yet
       ],
     );
     scenes[s.key] = row.id;
