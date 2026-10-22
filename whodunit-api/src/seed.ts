@@ -494,35 +494,37 @@ async function seed() {
       type: 'observation',
     },
     // ── Owner's office ──
+    // No x/y yet: we add them when the office image is ready.
     {
       key: 'staff_photo',
       name: 'Staff Photo',
       description:
-        'A dusty framed photo on the wall. After cleaning it, Clara is visible wearing a bracelet on her left wrist.',
+        "A dusty framed photo of the club's staff, from better days. Walter, Tom, Agnes and Clara, smiling by the stage. On Clara's left wrist: a thin bracelet.",
       detail_text:
-        'There she is, smiling. And on her wrist — a bracelet. I should check the body again.',
+        "So that's the bracelet she was tearing the dressing room apart for. She's wearing it here. So where is it now?",
       scene: 'owners_office',
       type: 'document',
     },
     {
-      key: 'salary_ledger',
-      name: 'Salary Ledger',
+      key: 'pay_sheets',
+      name: 'Pay Sheets',
       description:
-        "The club's pay records. The bartender took a significant pay cut three months ago. The cleaner's pay stayed the same. The singer was on a low part-time salary — three nights a week.",
+        "Three monthly pay sheets for the staff. Tom's pay was cut in the second month and stayed low. Agnes got the same pay every month. Clara earned little, because she only sang three nights a week.",
       detail_text:
-        'Bartender got his pay slashed. Singer barely earning anything working three nights. But the cleaner — same rate as always. Interesting.',
+        "Walter cut Tom's pay, and never put it back. But Agnes gets the same as always. Why cut the bartender and not the cleaner?",
       scene: 'owners_office',
       type: 'document',
     },
     {
-      key: 'operator_message',
-      name: 'Operator Message',
+      key: 'office_phone',
+      name: 'Office Phone',
       description:
-        "A note on the owner's desk: a phone message relayed through the operator, calling the detective to the club tonight. Anonymous. The club's phone number is on the message.",
+        "A telephone on Walter's desk. You lift the receiver, and the operator answers right away. The phone works.",
       detail_text:
-        'Someone called the operator from this club and asked them to reach me. Anonymous. Whoever did this wanted me here tonight.',
+        "A phone gets its power from the phone line, not from the building. A blown fuse can't touch it. So why did Agnes say it was dead?",
       scene: 'owners_office',
-      type: 'document',
+      suspect: 'agnes', // catches Agnes's lie
+      type: 'physical',
     },
     // ── Main bar ──
     {
