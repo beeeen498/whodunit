@@ -798,7 +798,7 @@ async function seed() {
   // ═══════════════════════════════════════════════════════════
   const evidenceConnections = [
     {
-      clue1: 'entry_wound',
+      clue1: 'gunshot_wound',
       clue2: 'broken_lamp',
       is_valid: true,
       realization:
@@ -838,13 +838,6 @@ async function seed() {
       is_valid: true,
       realization:
         'The heater masks the heat from the basement. Turn it off and anyone walking to the bathroom would feel it. The owner is hiding something down there.',
-    },
-    {
-      clue1: 'operator_message',
-      clue2: 'timestamped_message',
-      is_valid: true,
-      realization:
-        "The call came from the club's phone, during the cleaner's shift, hours before the murder. She lured me here. This was planned.",
     },
     {
       clue1: 'wife_keeps_coat',
