@@ -302,6 +302,22 @@ async function seed() {
   const suspects: Record<string, string> = {};
 
   const suspectData = [
+    // ── The victim ──
+    {
+      key: 'clara',
+      name: 'Clara Byrne',
+      role: 'Singer',
+      description:
+        'The victim. Sings at the club three nights a week. Four fingers on her left hand. Never took off her bracelet.',
+      is_guilty: false,
+      location_during_crime: null,
+      stated_alibi: null,
+      // ---- What the player sees in the People tab ----
+      profile:
+        'Singer at the Blue Moon Cabaret, three nights a week. I knew her once.',
+      status: 'victim',
+    },
+    // ── The suspects ──
     {
       key: 'agnes',
       name: 'Agnes Mott',
@@ -313,6 +329,9 @@ async function seed() {
         'Claims she was taking out the trash on the right side of the building.',
       stated_alibi:
         'Was outside emptying the trash bins when the lights went out. Came back in through the back alley entrance on the left.',
+      profile:
+        'Cleaner at the Blue Moon. Married to Harold. Quiet, keeps to herself.',
+      status: 'suspect',
     },
     {
       key: 'harold',
@@ -325,6 +344,9 @@ async function seed() {
         'Arrived at the club after closing to pick up his wife. Was in the main bar area when the lights went out.',
       stated_alibi:
         'Was at the bar waiting for Agnes to finish cleaning. Bartender and owner can confirm.',
+      profile:
+        "A butcher. Agnes's husband. Says he was in the bathroom when the lights went out.",
+      status: 'suspect',
     },
     {
       key: 'walter',
@@ -336,6 +358,9 @@ async function seed() {
       location_during_crime: "In his office counting the night's earnings.",
       stated_alibi:
         'Was in the office with the door open. Heard the bartender scream.',
+      profile:
+        "Owns the Blue Moon Cabaret. Nervous about anything that's bad for business.",
+      status: 'suspect',
     },
     {
       key: 'tom',
@@ -347,6 +372,9 @@ async function seed() {
       location_during_crime: 'Behind the bar cleaning up after closing.',
       stated_alibi:
         'Was cleaning glasses when the lights went out. Went to fix the fuse and found the body.',
+      profile:
+        'Bartender at the Blue Moon. Calm, knows everyone. Found the body.',
+      status: 'suspect',
     },
     {
       key: 'haggerty',
@@ -357,21 +385,29 @@ async function seed() {
       is_guilty: false,
       location_during_crime: 'Not at the club — arrives later with the police.',
       stated_alibi: 'N/A',
+      profile: 'Police detective on the case.',
+      status: 'police',
     },
   ];
 
   for (const s of suspectData) {
     const [row] = await db.query(
-      `INSERT INTO suspects (case_id, name, role, description, is_guilty, location_during_crime, stated_alibi)
-       VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
+      `INSERT INTO suspects (case_id, name, role, description, is_guilty, location_during_crime, stated_alibi,
+                             profile, status)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`,
       [
+        // ---- Author info (not shown to the player) ----
         caseId,
         s.name,
         s.role,
         s.description,
         s.is_guilty,
-        s.location_during_crime,
-        s.stated_alibi,
+        s.location_during_crime ?? null,
+        s.stated_alibi ?? null,
+
+        // ---- People tab ----
+        s.profile,
+        s.status,
       ],
     );
     suspects[s.key] = row.id;
