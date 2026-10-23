@@ -64,4 +64,12 @@ export class Clue {
 
   @Column({ nullable: true })
   inspect_url: string;
+
+  // ========================
+  // Catching lies
+  // For a statement clue: the clue that proves it wrong.
+  // Empty for most clues.
+  // ========================
+  @Column({ nullable: true })
+  disproved_by_clue_id: string;
 }

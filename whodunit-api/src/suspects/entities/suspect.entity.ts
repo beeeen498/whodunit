@@ -42,4 +42,15 @@ export class Suspect {
 
   @Column('text', { nullable: true })
   stated_alibi: string;
+
+  // ========================
+  // What the player sees in the People tab
+  // profile = short public note (no spoilers)
+  // status  = 'suspect' | 'victim' | 'police'
+  // ========================
+  @Column('text', { nullable: true })
+  profile: string;
+
+  @Column({ default: 'suspect' })
+  status: string;
 }
