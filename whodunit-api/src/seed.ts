@@ -438,6 +438,9 @@ async function seed() {
     y?: number;
     inspect_type?: string; // 'model' | 'letter' | 'image'
     inspect_url?: string;
+
+    // ---- Catching lies ----
+    disproved_by?: string; // key of the clue that proves this statement wrong
   };
 
   const clueData: ClueSeed[] = [
@@ -520,7 +523,8 @@ async function seed() {
       name: 'Tom Gave Clara a Key',
       description: 'Tom admitted he gave Clara a key to the club.',
       scene: 'dressing_room',
-      type: 'observation',
+      suspect: 'tom',
+      type: 'statement',
     },
     {
       key: 'owner_upset',
@@ -778,6 +782,56 @@ async function seed() {
       type: 'observation',
       required_clue: 'wife_lie_about_leak',
     },
+
+    // ── Statements: what people told the detective ──
+    // type 'statement' = shows under the person in People,
+    // not in the Clues tab.
+    {
+      key: 'tom_was_at_fuse',
+      name: 'Tom Was Fixing the Fuse',
+      description:
+        'Tom says he went to fix the fuse right outside the dressing room. When the lights came back, Clara was already dead.',
+      scene: 'dressing_room',
+      suspect: 'tom',
+      type: 'statement',
+    },
+    {
+      key: 'walter_was_in_hall',
+      name: 'Walter Was in the Main Hall',
+      description:
+        'Walter says he was with me in the main hall when the power went out. Then he heard Tom yelling.',
+      scene: 'dressing_room',
+      suspect: 'walter',
+      type: 'statement',
+    },
+    {
+      key: 'agnes_was_outside',
+      name: 'Agnes Was Outside',
+      description:
+        'Agnes says she was outside when the lights went out. She heard yelling and came back in.',
+      scene: 'dressing_room',
+      suspect: 'agnes',
+      type: 'statement',
+    },
+    {
+      key: 'agnes_phone_dead',
+      name: 'The Phone Is Dead',
+      description:
+        "Agnes says the power cut knocked out the office phone too, so we can't call the police from here.",
+      scene: 'dressing_room',
+      suspect: 'agnes',
+      type: 'statement',
+      disproved_by: 'office_phone', // the phone works
+    },
+    {
+      key: 'harold_in_bathroom',
+      name: 'Harold Was in the Bathroom',
+      description:
+        "Harold says he was in the bathroom when the lights went out. He heard nothing: the heater is loud, and he's deaf in one ear from the war.",
+      scene: 'dressing_room',
+      suspect: 'harold',
+      type: 'statement',
+    },
   ];
 
   for (const c of clueData) {
@@ -824,6 +878,21 @@ async function seed() {
         clues[requiredKey],
         clues[clueKey],
       ]);
+    }
+  }
+
+  // ========================
+  // Catching lies
+  // For each statement that is a lie, save the clue that
+  // proves it wrong. Done after all clues exist, so both
+  // ids are ready.
+  // ========================
+  for (const c of clueData) {
+    if (c.disproved_by) {
+      await db.query(
+        `UPDATE clues SET disproved_by_clue_id = $1 WHERE id = $2`,
+        [clues[c.disproved_by], clues[c.key]],
+      );
     }
   }
 
