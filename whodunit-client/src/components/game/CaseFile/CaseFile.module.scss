@@ -80,7 +80,17 @@
       border-radius: 0 6px 6px 6px;
       box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
 
-      .placeholder {
+      // ---- Clues tab: a grid of polaroids ----
+      // auto-fill = as many columns as fit, each at least 150px wide
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 1.75rem;
+        padding: 0.5rem;
+      }
+
+      // ---- When there's nothing to show yet ----
+      .empty {
         font-family: "Courier New", Courier, monospace;
         color: #3a2e1c;
       }

@@ -9,8 +9,8 @@ import styles from "./ClueModal.module.scss";
 
 interface ClueModalProps {
   clue: Clue;
-  imageUrl: string;
-  ratio: number; // width / height of the body image
+  imageUrl?: string; // the body picture (body panel only)
+  ratio?: number; // width / height of the body picture
   onClose: () => void;
 }
 
@@ -70,20 +70,32 @@ export default function ClueModal({
   let photoStyle: CSSProperties;
 
   if (isModel) {
+    // ---- A 3D model ----
     photoStyle = { aspectRatio: "4 / 3" };
   } else if (isImage) {
+    // ---- The clue's inspection picture (inspect_url) ----
     photoStyle = {
       aspectRatio: "4 / 3",
       backgroundImage: `url(${clue.inspect_url})`,
       backgroundSize: "cover",
       backgroundPosition: "center",
     };
-  } else {
+  } else if (imageUrl) {
+    // ---- From the body panel: a zoomed crop of the body picture ----
     photoStyle = {
-      aspectRatio: ratio,
+      aspectRatio: ratio ?? 16 / 9,
       backgroundImage: `url(${imageUrl})`,
       backgroundSize: `${hasSpot ? ZOOM * 100 : 100}%`,
       backgroundPosition: `${focusPercent(clue.x)}% ${focusPercent(clue.y)}%`,
+    };
+  } else {
+    // ---- From the Clues tab: the clue's own picture ----
+    // No picture yet = the dark photo area stays empty
+    photoStyle = {
+      aspectRatio: "4 / 3",
+      backgroundImage: clue.image_url ? `url(${clue.image_url})` : undefined,
+      backgroundSize: "cover",
+      backgroundPosition: "center",
     };
   }
 

@@ -1,8 +1,11 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import type { Clue } from "@/types";
 import { useUIStore } from "@/stores/uiStore";
 import { useGameStore } from "@/stores/gameStore";
+import ClueThumb from "@/components/game/ClueThumb/ClueThumb";
+import ClueModal from "@/components/game/ClueModal/ClueModal";
 import styles from "./CaseFile.module.scss";
 
 // ========================
@@ -15,6 +18,9 @@ export default function CaseFile() {
   const { activePanel, openPanel, closePanel } = useUIStore();
   const { foundClues, loadFoundClues } = useGameStore();
 
+  // The clue open in the big popup (null = none)
+  const [selectedClue, setSelectedClue] = useState<Clue | null>(null);
+
   const isOpen = activePanel === "clues" || activePanel === "people";
 
   // ========================
@@ -25,6 +31,12 @@ export default function CaseFile() {
   }, [isOpen, loadFoundClues]);
 
   if (!isOpen) return null;
+
+  // ========================
+  // Clues tab: everything except statements
+  // (statements show under the person in People)
+  // ========================
+  const clueCards = foundClues.filter((c) => c.type !== "statement");
 
   return (
     // ---- Dark background: click it to close ----
@@ -58,17 +70,37 @@ export default function CaseFile() {
 
         {/* ---- Inside the folder ---- */}
         <div className={styles.content}>
-          {/* For now, just a count, to test the endpoint */}
-          {activePanel === "clues" && (
-            <p className={styles.placeholder}>
-              {foundClues.length} clues found
-            </p>
-          )}
+          {/* ======================== CLUES TAB ======================== */}
+          {activePanel === "clues" &&
+            (clueCards.length === 0 ? (
+              <p className={styles.empty}>No clues yet.</p>
+            ) : (
+              <div className={styles.grid}>
+                {clueCards.map((clue, i) => (
+                  <ClueThumb
+                    key={clue.id}
+                    clue={clue}
+                    index={i}
+                    onClick={() => setSelectedClue(clue)}
+                  />
+                ))}
+              </div>
+            ))}
 
+          {/* ======================== PEOPLE TAB ======================== */}
           {activePanel === "people" && (
-            <p className={styles.placeholder}>People go here</p>
+            <p className={styles.empty}>People go here</p>
           )}
         </div>
+
+        {/* ---- Big popup for the clicked clue ----
+            Inside the folder, so clicking it doesn't close the folder */}
+        {selectedClue && (
+          <ClueModal
+            clue={selectedClue}
+            onClose={() => setSelectedClue(null)}
+          />
+        )}
       </div>
     </div>
   );
