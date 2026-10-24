@@ -452,6 +452,7 @@ async function seed() {
       description:
         'Clara lies face down, her back to the door. She was shot from behind and probably never saw her killer.',
       scene: 'dressing_room',
+      suspect: 'clara',
       type: 'observation',
       // no x/y: this clue opens when the body is clicked
     },
@@ -463,6 +464,7 @@ async function seed() {
       detail_text:
         'She lost it when she was a kid. She never liked talking about it.',
       scene: 'dressing_room',
+      suspect: 'clara',
       type: 'physical',
       x: 4.3,
       y: 52.9,
@@ -474,6 +476,7 @@ async function seed() {
         "One entry wound at the back of her head. No powder burns, no scorching around it. This wasn't fired at point-blank range. The killer stood back and took aim.",
       detail_text: 'She never turned around. Whoever did this took their time.',
       scene: 'dressing_room',
+      suspect: 'clara',
       type: 'physical',
       x: 24.4,
       y: 22.6,
@@ -511,6 +514,7 @@ async function seed() {
       description: 'Clara,\n\nwe need to talk about what happened.\n\nTom',
       detail_text: 'From Tom. What did he need to talk to her about?',
       scene: 'dressing_room',
+      suspect: 'tom',
       type: 'document',
       x: 65,
       y: 37,
@@ -532,6 +536,7 @@ async function seed() {
       name: 'The Owner Seems Upset',
       description: 'Walter was upset that Tom gave Clara a key to the club.',
       scene: 'dressing_room',
+      suspect: 'walter',
       type: 'observation',
     },
     // ── Owner's office ──
@@ -544,6 +549,7 @@ async function seed() {
       detail_text:
         "So that's the bracelet she was tearing the dressing room apart for. She's wearing it here. So where is it now?",
       scene: 'owners_office',
+      suspect: 'clara',
       type: 'document',
     },
     {
@@ -554,6 +560,7 @@ async function seed() {
       detail_text:
         "Walter cut Tom's pay, and never put it back. But Agnes gets the same as always. Why cut the bartender and not the cleaner?",
       scene: 'owners_office',
+      suspect: 'tom',
       type: 'document',
     },
     {
