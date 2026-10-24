@@ -72,4 +72,11 @@ export class Clue {
   // ========================
   @Column({ nullable: true })
   disproved_by_clue_id: string;
+
+  // ========================
+  // The clue's own picture, shown on its polaroid
+  // in the Clues tab. Empty = dark photo with the name.
+  // ========================
+  @Column({ nullable: true })
+  image_url: string;
 }

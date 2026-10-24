@@ -4,7 +4,10 @@ import { create } from "zustand";
 // Types
 // ========================
 
-type Panel = "none" | "inventory" | "evidence" | "suspects" | "map";
+// Which panel is open.
+// "clues" and "people" are the two tabs of the case file.
+type Panel = "none" | "clues" | "people" | "map";
+
 type Modal =
   | "none"
   | "clue"

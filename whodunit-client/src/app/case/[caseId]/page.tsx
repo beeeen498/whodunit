@@ -6,6 +6,7 @@ import { useGameStore } from "@/stores/gameStore";
 import Header from "@/components/shared/Header/Header";
 import SceneViewer from "@/components/game/SceneViewer/SceneViewer";
 import ActionBar from "@/app/(game)/ActionBar/ActionBar";
+import CaseFile from "@/components/game/CaseFile/CaseFile";
 import DevTools from "@/components/game/DevTools/DevTools";
 import Footer from "@/components/shared/Footer/Footer";
 import styles from "./page.module.scss";
@@ -50,7 +51,11 @@ export default function GamePage() {
 
       {/* Scene viewer will go here */}
       <main className={styles.sceneArea}>
-        <SceneViewer />
+        {/* Scene, with the case file on top of it */}
+        <div className={styles.sceneWrapper}>
+          <SceneViewer />
+          <CaseFile />
+        </div>
 
         {/* Action bar */}
         <ActionBar />

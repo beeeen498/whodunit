@@ -16,6 +16,17 @@
     flex-direction: column;
     position: relative;
     align-items: stretch;
+
+    // ---- Box around the scene ----
+    // The case file is placed inside it (position: absolute),
+    // so it covers the scene but not the ActionBar
+    .sceneWrapper {
+      flex: 1;
+      min-height: 0;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
   }
 
   .placeholder {

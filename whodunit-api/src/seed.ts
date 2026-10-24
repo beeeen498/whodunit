@@ -438,6 +438,7 @@ async function seed() {
     y?: number;
     inspect_type?: string; // 'model' | 'letter' | 'image'
     inspect_url?: string;
+    image_url?: string; // polaroid picture in the Clues tab
 
     // ---- Catching lies ----
     disproved_by?: string; // key of the clue that proves this statement wrong
@@ -455,6 +456,7 @@ async function seed() {
       suspect: 'clara',
       type: 'observation',
       // no x/y: this clue opens when the body is clicked
+      image_url: '/assets/images/clues/body-position.png.jpg',
     },
     {
       key: 'four_fingers',
@@ -468,6 +470,7 @@ async function seed() {
       type: 'physical',
       x: 4.3,
       y: 52.9,
+      image_url: '/assets/images/clues/four-fingers.png',
     },
     {
       key: 'gunshot_wound',
@@ -480,6 +483,7 @@ async function seed() {
       type: 'physical',
       x: 24.4,
       y: 22.6,
+      image_url: '/assets/images/clues/gunshot-wounds.png',
     },
     {
       key: 'revolver',
@@ -494,6 +498,7 @@ async function seed() {
       y: 18.9,
       inspect_type: 'model',
       inspect_url: '/assets/models/gun.glb',
+      image_url: '/assets/images/clues/revolver.png',
     },
     {
       key: 'club_key',
@@ -507,6 +512,7 @@ async function seed() {
       y: 71.8,
       inspect_type: 'model',
       inspect_url: '/assets/models/key.glb',
+      image_url: '/assets/images/clues/key.png',
     },
     {
       key: 'folded_note',
@@ -519,6 +525,7 @@ async function seed() {
       x: 65,
       y: 37,
       inspect_type: 'letter',
+      image_url: '/assets/images/clues/note.png',
     },
 
     // ── Dressing room: added after the Club Key reactions ──
@@ -845,8 +852,8 @@ async function seed() {
   for (const c of clueData) {
     const [row] = await db.query(
       `INSERT INTO clues (case_id, name, description, detail_text, scene_id, suspect_id, required_clue_id, type,
-                          x, y, inspect_type, inspect_url)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING id`,
+                          x, y, inspect_type, inspect_url, image_url)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING id`,
       [
         // ---- Basic info ----
         caseId,
@@ -867,6 +874,7 @@ async function seed() {
         c.y ?? null,
         c.inspect_type ?? null,
         c.inspect_url ?? null,
+        c.image_url ?? null,
       ],
     );
     clues[c.key] = row.id;

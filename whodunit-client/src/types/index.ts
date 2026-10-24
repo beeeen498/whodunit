@@ -70,6 +70,9 @@ export interface Clue {
   // Empty for most clues.
   // ========================
   disproved_by_clue_id: string | null;
+
+  // The clue's own picture for its polaroid (empty = no picture yet)
+  image_url: string | null;
 }
 
 export interface Suspect {

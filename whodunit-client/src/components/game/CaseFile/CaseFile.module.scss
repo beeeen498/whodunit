@@ -1,0 +1,89 @@
+// ========================
+// CaseFile — a paper case folder over the scene
+// ========================
+
+.backdrop {
+  position: absolute;
+  inset: 0; // cover the whole scene
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.75);
+
+  // ========================
+  // The folder
+  // ========================
+  .folder {
+    width: min(900px, 92%);
+    height: 85%;
+    display: flex;
+    flex-direction: column;
+
+    // ---- Tabs on top of the folder ----
+    .tabs {
+      display: flex;
+      align-items: flex-end;
+      gap: 0.25rem;
+      padding-left: 1.5rem;
+
+      .tab {
+        font-family: "Courier New", Courier, monospace;
+        font-size: 0.8rem;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: #3a2e1c;
+        padding: 0.5rem 1.5rem;
+        border: none;
+        border-radius: 6px 6px 0 0;
+        background-color: #8f7748; // darker = tab at the back
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+
+        &:hover {
+          background-color: #a88d58;
+        }
+
+        // Same color as the folder = this tab is in front
+        &.activeTab {
+          background-color: #c2a46c;
+        }
+      }
+
+      // ---- Close, pushed to the right ----
+      .close {
+        margin-left: auto;
+        margin-bottom: 0.4rem;
+        font-family: "Georgia", "Times New Roman", serif;
+        font-size: 0.7rem;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: #999;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        transition: color 0.3s ease;
+
+        &:hover {
+          color: #c8aa50;
+        }
+      }
+    }
+
+    // ---- Inside of the folder ----
+    .content {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto; // scroll when there are many clues
+      padding: 1.5rem;
+      background-color: #c2a46c;
+      border-radius: 0 6px 6px 6px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+
+      .placeholder {
+        font-family: "Courier New", Courier, monospace;
+        color: #3a2e1c;
+      }
+    }
+  }
+}

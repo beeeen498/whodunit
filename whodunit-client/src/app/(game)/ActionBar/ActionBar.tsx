@@ -16,32 +16,24 @@ export default function ActionBar() {
   return (
     <div className={styles.bar}>
       {/* Left — game action buttons */}
+      {/* Both open the case file, each on its own tab */}
       <div className={styles.actions}>
         <button
           className={`${styles.actionButton} ${
-            activePanel === "inventory" ? styles.active : ""
+            activePanel === "clues" ? styles.active : ""
           }`}
-          onClick={() => togglePanel("inventory")}
+          onClick={() => togglePanel("clues")}
         >
           Clues
         </button>
 
         <button
           className={`${styles.actionButton} ${
-            activePanel === "evidence" ? styles.active : ""
+            activePanel === "people" ? styles.active : ""
           }`}
-          onClick={() => togglePanel("evidence")}
+          onClick={() => togglePanel("people")}
         >
-          Evidence
-        </button>
-
-        <button
-          className={`${styles.actionButton} ${
-            activePanel === "suspects" ? styles.active : ""
-          }`}
-          onClick={() => togglePanel("suspects")}
-        >
-          Suspects
+          People
         </button>
       </div>
 
