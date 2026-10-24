@@ -312,9 +312,9 @@ async function seed() {
       is_guilty: false,
       location_during_crime: null,
       stated_alibi: null,
-      // ---- What the player sees in the People tab ----
       profile:
         'Singer at the Blue Moon Cabaret, three nights a week. I knew her once.',
+      portrait_url: '/assets/images/characters/clara-portrait.png',
       status: 'victim',
     },
     // ── The suspects ──
@@ -331,6 +331,7 @@ async function seed() {
         'Was outside emptying the trash bins when the lights went out. Came back in through the back alley entrance on the left.',
       profile:
         'Cleaner at the Blue Moon. Married to Harold. Quiet, keeps to herself.',
+      portrait_url: '/assets/images/characters/wife-portrait.png',
       status: 'suspect',
     },
     {
@@ -346,6 +347,7 @@ async function seed() {
         'Was at the bar waiting for Agnes to finish cleaning. Bartender and owner can confirm.',
       profile:
         "A butcher. Agnes's husband. Says he was in the bathroom when the lights went out.",
+      portrait_url: '/assets/images/characters/husband-portrait.png',
       status: 'suspect',
     },
     {
@@ -360,6 +362,7 @@ async function seed() {
         'Was in the office with the door open. Heard the bartender scream.',
       profile:
         "Owns the Blue Moon Cabaret. Nervous about anything that's bad for business.",
+      portrait_url: '/assets/images/characters/owner-portrait.png',
       status: 'suspect',
     },
     {
@@ -374,6 +377,7 @@ async function seed() {
         'Was cleaning glasses when the lights went out. Went to fix the fuse and found the body.',
       profile:
         'Bartender at the Blue Moon. Calm, knows everyone. Found the body.',
+      portrait_url: '/assets/images/characters/bartender-portrait.png',
       status: 'suspect',
     },
     {
@@ -393,8 +397,8 @@ async function seed() {
   for (const s of suspectData) {
     const [row] = await db.query(
       `INSERT INTO suspects (case_id, name, role, description, is_guilty, location_during_crime, stated_alibi,
-                             profile, status)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`,
+                             profile, status, portrait_url)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id`,
       [
         // ---- Author info (not shown to the player) ----
         caseId,
@@ -408,11 +412,11 @@ async function seed() {
         // ---- People tab ----
         s.profile,
         s.status,
+        s.portrait_url ?? null, // Haggerty has none yet
       ],
     );
     suspects[s.key] = row.id;
   }
-  console.log(`Suspects created: ${Object.keys(suspects).length}`);
 
   // ═══════════════════════════════════════════════════════════
   // CLUES
@@ -544,7 +548,7 @@ async function seed() {
       description: 'Walter was upset that Tom gave Clara a key to the club.',
       scene: 'dressing_room',
       suspect: 'walter',
-      type: 'statement', 
+      type: 'statement',
     },
     // ── Owner's office ──
     // No x/y yet: we add them when the office image is ready.
