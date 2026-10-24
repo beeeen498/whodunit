@@ -456,7 +456,7 @@ async function seed() {
       suspect: 'clara',
       type: 'observation',
       // no x/y: this clue opens when the body is clicked
-      image_url: '/assets/images/clues/body-position.png.jpg',
+      image_url: '/assets/images/clues/body-position.png',
     },
     {
       key: 'four_fingers',

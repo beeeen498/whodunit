@@ -2,6 +2,7 @@
 
 import { useUIStore } from "@/stores/uiStore";
 import { useAudioStore } from "@/stores/audioStore";
+import { useGameStore } from "@/stores/gameStore";
 import styles from "./ActionBar.module.scss";
 
 // ========================
@@ -10,8 +11,10 @@ import styles from "./ActionBar.module.scss";
 // ========================
 
 export default function ActionBar() {
-  const { activePanel, togglePanel } = useUIStore();
   const { isMuted, toggleMute } = useAudioStore();
+  const { activePanel, togglePanel } = useUIStore();
+  // Is there a clue the player hasn't looked at yet?
+  const { hasNewClues } = useGameStore();
 
   return (
     <div className={styles.bar}>
@@ -25,6 +28,8 @@ export default function ActionBar() {
           onClick={() => togglePanel("clues")}
         >
           Clues
+          {/* Small dot: a new clue was added to the case file */}
+          {hasNewClues && <span className={styles.newDot} />}
         </button>
 
         <button

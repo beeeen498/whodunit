@@ -16,7 +16,7 @@ import styles from "./CaseFile.module.scss";
 
 export default function CaseFile() {
   const { activePanel, openPanel, closePanel } = useUIStore();
-  const { foundClues, loadFoundClues } = useGameStore();
+  const { foundClues, loadFoundClues, markSeen } = useGameStore();
 
   // The clue open in the big popup (null = none)
   const [selectedClue, setSelectedClue] = useState<Clue | null>(null);
@@ -29,6 +29,15 @@ export default function CaseFile() {
   useEffect(() => {
     if (isOpen) loadFoundClues();
   }, [isOpen, loadFoundClues]);
+
+  // ========================
+  // Opening a tab = the player has seen what's new there
+  // ========================
+  useEffect(() => {
+    if (activePanel === "clues" || activePanel === "people") {
+      markSeen(activePanel);
+    }
+  }, [activePanel, markSeen]);
 
   if (!isOpen) return null;
 

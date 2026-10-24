@@ -30,9 +30,13 @@ interface GameStore {
   currentClues: Clue[];
   currentConnections: SceneConnection[];
 
-  // ---- NEW ----
   // Every clue the player found (all scenes), for the Clues panel
   foundClues: Clue[];
+
+  // Something new the player hasn't looked at yet
+  // (shows a dot on the ActionBar button)
+  hasNewClues: boolean;
+  hasNewPeople: boolean;
 
   // Dialogue
   currentDialogue: DialogueNode[];
@@ -46,7 +50,8 @@ interface GameStore {
   initGame: (caseId: string) => Promise<void>;
   loadScene: (sceneId: string) => Promise<void>;
   discoverClue: (clueId: string) => Promise<void>;
-  loadFoundClues: () => Promise<void>; // ---- NEW ----
+  loadFoundClues: () => Promise<void>;
+  markSeen: (tab: "clues" | "people") => void;
   visitScene: (sceneId: string) => Promise<void>;
   makeConnection: (connectionId: string) => Promise<void>;
   startDialogue: (suspect: Suspect) => Promise<void>;
@@ -73,7 +78,9 @@ const initialState = {
   currentScene: null,
   currentClues: [],
   currentConnections: [],
-  foundClues: [], // ---- NEW ----
+  foundClues: [],
+  hasNewClues: false,
+  hasNewPeople: false,
   currentDialogue: [],
   activeSuspect: null,
   loading: false,
@@ -150,16 +157,27 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
   },
 
+  // ========================
   // Add a clue to the found list
+  // ========================
   discoverClue: async (clueId: string) => {
-    const { gameState } = get();
+    const { gameState, currentClues } = get();
     if (!gameState) return;
+
+    // ---- Already found: do nothing (no double, no dot) ----
+    if (gameState.clues_found.includes(clueId)) return;
+
+    // ---- Is it a statement? ----
+    // Statements are new in People, everything else in Clues
+    const clue = currentClues.find((c) => c.id === clueId);
+    const isStatement = clue?.type === "statement";
 
     set({
       gameState: {
         ...gameState,
         clues_found: [...gameState.clues_found, clueId],
       },
+      ...(isStatement ? { hasNewPeople: true } : { hasNewClues: true }),
     });
   },
 
@@ -180,6 +198,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
       set({ error: (err as Error).message });
     }
   },
+
+  // ========================
+  // The player opened a tab: nothing new there anymore
+  // ========================
+  markSeen: (tab) =>
+    set(tab === "clues" ? { hasNewClues: false } : { hasNewPeople: false }),
 
   // Mark a scene as visited
   visitScene: async (sceneId: string) => {
