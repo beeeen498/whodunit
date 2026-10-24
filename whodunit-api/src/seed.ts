@@ -498,6 +498,7 @@ async function seed() {
       description:
         'A small brass key lying at her side. It looks like a spare key to the club.',
       scene: 'dressing_room',
+      suspect: 'clara', // found on her body
       type: 'physical',
       x: 41,
       y: 71.8,
