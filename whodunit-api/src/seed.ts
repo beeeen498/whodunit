@@ -544,7 +544,7 @@ async function seed() {
       description: 'Walter was upset that Tom gave Clara a key to the club.',
       scene: 'dressing_room',
       suspect: 'walter',
-      type: 'observation',
+      type: 'statement', 
     },
     // ── Owner's office ──
     // No x/y yet: we add them when the office image is ready.
