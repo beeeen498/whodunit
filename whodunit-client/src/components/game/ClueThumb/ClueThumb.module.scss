@@ -1,0 +1,55 @@
+// ========================
+// ClueThumb — one small polaroid in the Clues tab
+// ========================
+
+.polaroid {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 0.6rem 0.6rem 0.8rem;
+  background-color: #e9e4d8; // same paper color as the big polaroid
+  border: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+  cursor: pointer;
+  transform: rotate(var(--tilt));
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+
+  // ---- Hover / keyboard focus: straighten and lift ----
+  &:hover,
+  &:focus-visible {
+    transform: rotate(0deg) translateY(-4px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.45);
+  }
+
+  // ========================
+  // The photo area (4:3, like the pictures)
+  // ========================
+  .photo {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    background-color: #111; // dark when there's no picture
+    overflow: hidden;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover; // fill the area, cut the edges if needed
+      display: block;
+    }
+  }
+
+  // ========================
+  // The name under the photo
+  // ========================
+  .caption {
+    margin-top: 0.6rem;
+    font-family: "Courier New", Courier, monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-align: center;
+    color: #1a1a1a;
+  }
+}
