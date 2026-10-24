@@ -54,7 +54,7 @@ export interface Clue {
   scene_id: string | null;
   suspect_id: string | null;
   required_clue_id: string | null;
-  type: string; // 'physical' | 'dialogue' | 'document' | 'observation'
+  type: string; // 'physical' | 'document' | 'observation' | 'statement'
 
   // ========================
   // Body panel: where the clue sits on the inspection image (percent)
@@ -64,6 +64,12 @@ export interface Clue {
   y: number | null;
   inspect_type: string | null; // 'image' | 'model' | ...
   inspect_url: string | null;
+
+  // ========================
+  // Catching lies: for a statement, the clue that proves it wrong.
+  // Empty for most clues.
+  // ========================
+  disproved_by_clue_id: string | null;
 }
 
 export interface Suspect {
@@ -76,7 +82,14 @@ export interface Suspect {
   description: string | null;
   location_during_crime: string | null;
   stated_alibi: string | null;
-  // is_guilty is never sent to frontend
+
+  // ========================
+  // People tab
+  // profile = short public note the player sees
+  // status  = 'suspect' | 'victim' | 'police'
+  // ========================
+  profile: string | null;
+  status: string;
 }
 
 export interface DialogueNode {
