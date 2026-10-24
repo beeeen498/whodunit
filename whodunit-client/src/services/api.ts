@@ -10,6 +10,7 @@ import type {
   ScriptedEvent,
   Audio,
   Player,
+  Clue,
 } from "../types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
@@ -131,6 +132,20 @@ export async function getScenesByCase(caseId: string): Promise<Scene[]> {
 
 export async function getSuspects(caseId: string): Promise<Suspect[]> {
   return request<Suspect[]>(`/suspects/case/${caseId}`);
+}
+
+// ========================
+// Clues
+// ========================
+
+// Get the full clues for the ids the player found,
+// in the order they found them
+export async function getFoundClues(ids: string[]): Promise<Clue[]> {
+  // Nothing found yet: no need to call the backend
+  if (ids.length === 0) return [];
+
+  // ["a", "b"] → "a,b"
+  return request<Clue[]>(`/clues/found?ids=${ids.join(",")}`);
 }
 
 // ========================

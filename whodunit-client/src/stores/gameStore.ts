@@ -30,6 +30,10 @@ interface GameStore {
   currentClues: Clue[];
   currentConnections: SceneConnection[];
 
+  // ---- NEW ----
+  // Every clue the player found (all scenes), for the Clues panel
+  foundClues: Clue[];
+
   // Dialogue
   currentDialogue: DialogueNode[];
   activeSuspect: Suspect | null;
@@ -42,7 +46,7 @@ interface GameStore {
   initGame: (caseId: string) => Promise<void>;
   loadScene: (sceneId: string) => Promise<void>;
   discoverClue: (clueId: string) => Promise<void>;
-  resetClues: () => void;
+  loadFoundClues: () => Promise<void>; // ---- NEW ----
   visitScene: (sceneId: string) => Promise<void>;
   makeConnection: (connectionId: string) => Promise<void>;
   startDialogue: (suspect: Suspect) => Promise<void>;
@@ -69,6 +73,7 @@ const initialState = {
   currentScene: null,
   currentClues: [],
   currentConnections: [],
+  foundClues: [], // ---- NEW ----
   currentDialogue: [],
   activeSuspect: null,
   loading: false,
@@ -150,8 +155,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const { gameState } = get();
     if (!gameState) return;
 
-    if (gameState.clues_found.includes(clueId)) return;
-
     set({
       gameState: {
         ...gameState,
@@ -160,11 +163,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
     });
   },
 
-  // Dev: forget all found clues
-  resetClues: () => {
+  // ---- NEW ----
+  // ========================
+  // Load the full clues the player found, from every scene,
+  // in the order they were found. The Clues panel calls this
+  // each time it opens, so it's always up to date.
+  // ========================
+  loadFoundClues: async () => {
     const { gameState } = get();
     if (!gameState) return;
-    set({ gameState: { ...gameState, clues_found: [] } });
+
+    try {
+      const clues = await api.getFoundClues(gameState.clues_found);
+      set({ foundClues: clues });
+    } catch (err) {
+      set({ error: (err as Error).message });
+    }
   },
 
   // Mark a scene as visited
