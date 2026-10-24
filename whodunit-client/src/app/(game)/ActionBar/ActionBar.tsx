@@ -13,8 +13,8 @@ import styles from "./ActionBar.module.scss";
 export default function ActionBar() {
   const { isMuted, toggleMute } = useAudioStore();
   const { activePanel, togglePanel } = useUIStore();
-  // Is there a clue the player hasn't looked at yet?
-  const { hasNewClues } = useGameStore();
+  // Is there something the player hasn't looked at yet?
+  const { hasNewClues, hasNewPeople } = useGameStore();
 
   return (
     <div className={styles.bar}>
@@ -39,6 +39,8 @@ export default function ActionBar() {
           onClick={() => togglePanel("people")}
         >
           People
+          {/* Small dot: something new was added about a person */}
+          {hasNewPeople && <span className={styles.newDot} />}
         </button>
       </div>
 

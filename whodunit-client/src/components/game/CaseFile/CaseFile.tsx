@@ -6,6 +6,7 @@ import { useUIStore } from "@/stores/uiStore";
 import { useGameStore } from "@/stores/gameStore";
 import ClueThumb from "@/components/game/ClueThumb/ClueThumb";
 import ClueModal from "@/components/game/ClueModal/ClueModal";
+import PeopleTab from "@/components/game/PeopleTab/PeopleTab";
 import styles from "./CaseFile.module.scss";
 
 // ========================
@@ -97,8 +98,9 @@ export default function CaseFile() {
             ))}
 
           {/* ======================== PEOPLE TAB ======================== */}
+          {/* Clicking a clue opens the same big popup as the Clues tab */}
           {activePanel === "people" && (
-            <p className={styles.empty}>People go here</p>
+            <PeopleTab onClueClick={setSelectedClue} />
           )}
         </div>
 
