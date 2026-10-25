@@ -848,7 +848,7 @@ async function seed() {
       key: 'harold_in_bathroom',
       name: 'Harold Was in the Bathroom',
       description:
-        "Harold says he was in the bathroom when the lights went out. He heard nothing: the heater is loud, and he's deaf in one ear from the war.",
+        'Harold says he was in the bathroom when the lights went out. He heard nothing: he lost part of his hearing in the war, and the rain and the jukebox drowned everything out.',
       scene: 'dressing_room',
       suspect: 'harold',
       type: 'statement',

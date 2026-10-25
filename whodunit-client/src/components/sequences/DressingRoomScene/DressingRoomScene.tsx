@@ -52,6 +52,17 @@ export default function DressingRoomScene({ exits }: DressingRoomSceneProps) {
   } = useUIStore();
 
   // ========================
+  // Save a statement as found, by its name in the database.
+  // It then shows under the person in People.
+  // Saying it twice is fine: discoverClue ignores repeats.
+  // ========================
+  const discoverStatement = (name: string) => {
+    const { currentClues, discoverClue } = useGameStore.getState();
+    const clue = currentClues.find((c) => c.name === name);
+    if (clue) discoverClue(clue.id);
+  };
+
+  // ========================
   // Auto-focus: highlight whoever is speaking
   // ========================
   useEffect(() => {
@@ -265,13 +276,15 @@ export default function DressingRoomScene({ exits }: DressingRoomSceneProps) {
   }, [dressingStep]);
 
   // ========================
-  // Agnes reappears exactly when her own line
-  // starts playing in the "lie" step
+  // Agnes reappears exactly when her own line starts
+  // in the "lie" step. That same line is her lie about
+  // the phone, so it's saved in People too.
   // ========================
   useEffect(() => {
     if (dressingStep !== "lie") return;
     if (activeLine?.text?.includes("I couldn't make a call")) {
       setAgnesAway(false);
+      discoverStatement("The Phone Is Dead");
     }
   }, [activeLine, dressingStep]);
 
@@ -472,6 +485,7 @@ export default function DressingRoomScene({ exits }: DressingRoomSceneProps) {
       color: string;
       name: string;
       thought: string;
+      statementName: string; // the statement's name in the database
     }
   > = {
     walter: {
@@ -481,6 +495,7 @@ export default function DressingRoomScene({ exits }: DressingRoomSceneProps) {
       color: CHARACTERS.walter.color,
       thought:
         "He was with you the whole time. But he doesn't want police anywhere near this place. Is that just business, or is he hiding something?",
+      statementName: "Walter Was in the Main Hall",
     },
     agnes: {
       question: "Agnes, what were you doing during all this?",
@@ -488,6 +503,7 @@ export default function DressingRoomScene({ exits }: DressingRoomSceneProps) {
       text: "I was outside. I heard yelling and came back in.",
       color: CHARACTERS.agnes.color,
       thought: "If neither of the men did it... could it have been her?",
+      statementName: "Agnes Was Outside",
     },
     tom: {
       question: "Tom, walk me through what happened.",
@@ -496,6 +512,7 @@ export default function DressingRoomScene({ exits }: DressingRoomSceneProps) {
       color: CHARACTERS.tom.color,
       thought:
         "He was right outside, alone, in the dark, fixing that fuse. If he'd slipped in and out, no one would have seen a thing. But if he did it... why scream and drag everyone's attention straight to himself?",
+      statementName: "Tom Was Fixing the Fuse",
     },
   };
 
@@ -610,6 +627,9 @@ export default function DressingRoomScene({ exits }: DressingRoomSceneProps) {
     ];
 
     if (id === "heard") {
+      // ---- His alibi is complete: save it in People ----
+      discoverStatement("Harold Was in the Bathroom");
+
       addLines([...lines, ...confrontation]);
       return;
     }
@@ -647,6 +667,9 @@ export default function DressingRoomScene({ exits }: DressingRoomSceneProps) {
 
     const updated = new Set(talkedTo).add(finished);
     setTalkedTo(updated);
+
+    // ---- Their statement goes into People ----
+    discoverStatement(statement.statementName);
 
     // Only the first time we talk to this suspect, and only on the third
     if (talkedTo.has(finished) || updated.size !== 3) return;
