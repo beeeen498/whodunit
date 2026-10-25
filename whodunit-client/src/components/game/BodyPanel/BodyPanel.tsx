@@ -272,6 +272,23 @@ export default function BodyPanel({ suspectsTalkedTo }: BodyPanelProps) {
 
     lines.push(...reactions);
 
+    // ========================
+    // The detective's thought about what was just learned.
+    // Statements this clue unlocks (like "The Owner Seems Upset")
+    // can have their own detail_text in the database.
+    // ========================
+    const unlockedThoughts = (CLUE_UNLOCKS[clue.name] ?? [])
+      .map((name) => currentClues.find((c) => c.name === name)?.detail_text)
+      .filter((text): text is string => !!text);
+
+    for (const text of unlockedThoughts) {
+      lines.push({
+        text,
+        speaker: `Detective ${playerName}`, // narrator: CHARACTERS.narrator.name
+        color: CHARACTERS.detective.color,
+      });
+    }
+
     if (completed) {
       lines.push({
         text: suspectsTalkedTo

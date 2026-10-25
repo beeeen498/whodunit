@@ -546,6 +546,8 @@ async function seed() {
       key: 'owner_upset',
       name: 'The Owner Seems Upset',
       description: 'Walter was upset that Tom gave Clara a key to the club.',
+      detail_text:
+        "Tom gave Clara a key, and Walter didn't take it well. A spare key shouldn't make a man that angry. I wonder if there's a reason for that...",
       scene: 'dressing_room',
       suspect: 'walter',
       type: 'statement',
